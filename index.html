@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>金門風獅爺尋寶手札 🦁</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Google Fonts: 手繪/圓體風格字型 -->
+  <link href="https://fonts.googleapis.com/css2?family=Yomogi&family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
+  
+  <!-- Leaflet CSS & JS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <style>
+    :root {
+      --bg-paper: #FDF8EC;
+      --ink-black: #3D312A;
+      --lion-red: #E05A47;
+      --lion-gold: #F2B705;
+      --sage-green: #68A678;
+    }
+
+    body {
+      font-family: 'Zen Maru Gothic', 'Yomogi', sans-serif;
+      background-color: var(--bg-paper);
+      color: var(--ink-black);
+      /* 手帳點陣紙背景 */
+      background-image: radial-gradient(#D8C8B0 1.5px, transparent 1.5px);
+      background-size: 22px 22px;
+      overflow-x: hidden;
+      user-select: none;
+    }
+
+    /* 手繪不規則邊框 (奇異筆感) */
+    .sketch-box {
+      border: 3px solid var(--ink-black);
+      border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+      box-shadow: 4px 4px 0px var(--ink-black);
+      background-color: #FFFFFF;
+      transition: all 0.15s ease;
+    }
+
+    .sketch-box-sm {
+      border: 2.5px solid var(--ink-black);
+      border-radius: 15px 225px 15px 255px / 255px 15px 225px 15px;
+      box-shadow: 3px 3px 0px var(--ink-black);
+    }
+
+    .sketch-btn {
+      border: 2.5px solid var(--ink-black);
+      border-radius: 255px 25px 225px 25px / 25px 225px 25px 255px;
+      box-shadow: 3px 3px 0px var(--ink-black);
+      transition: transform 0.1s ease, box-shadow 0.1s ease;
+      cursor: pointer;
+    }
+
+    .sketch-btn:active {
+      transform: translate(2px, 2px);
+      box-shadow: 1px 1px 0px var(--ink-black);
+    }
+
+    /* 印章動畫效果 */
+    @keyframes stamp-slam {
+      0% { transform: scale(2.5) rotate(-25deg); opacity: 0; }
+      70% { transform: scale(0.9) rotate(-12deg); opacity: 1; }
+      100% { transform: scale(1) rotate(-12deg); opacity: 0.92; }
+    }
+
+    .stamp-badge {
+      border: 3px double #D63A2F;
+      color: #D63A2F;
+      padding: 2px 10px;
+      font-weight: 900;
+      letter-spacing: 1px;
+      border-radius: 8px;
+      transform: rotate(-12deg);
+      animation: stamp-slam 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+      background: rgba(255, 245, 245, 0.88);
+      box-shadow: inset 0 0 0 1px #D63A2F;
+    }
+
+    /* 溫暖手繪風地圖濾鏡 */
+    .leaflet-tile-pane {
+      filter: sepia(28%) saturate(85%) hue-rotate(345deg) contrast(95%) brightness(102%);
+    }
+
+    .leaflet-container {
+      font-family: 'Zen Maru Gothic', sans-serif;
+      background: #EAE0C8;
+    }
+
+    /* 自訂地圖 Popup 變身手繪卡片 */
+    .leaflet-popup-content-wrapper {
+      border: 3px solid var(--ink-black);
+      border-radius: 20px 8px 22px 8px / 8px 22px 8px 20px;
+      box-shadow: 4px 4px 0px var(--ink-black);
+      background: #FFFDF7;
+      padding: 2px;
+    }
+
+    .leaflet-popup-tip {
+      background: var(--ink-black);
+    }
+
+    /* 紙膠帶裝飾 */
+    .washi-tape {
+      position: absolute;
+      top: -10px;
+      left: 50%;
+      transform: translateX(-50%) rotate(-2deg);
+      width: 90px;
+      height: 22px;
+      background-color: rgba(242, 183, 5, 0.45);
+      border-left: 2px dashed rgba(61, 49, 42, 0.25);
+      border-right: 2px dashed rgba(61, 49, 42, 0.25);
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    /* 浮動搖擺動畫 */
+    @keyframes wobble {
+      0%, 100% { transform: rotate(-2deg); }
+      50% { transform: rotate(2deg); }
+    }
+    .wobble-hover:hover {
+      animation: wobble 0.6s infinite ease-in-out;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col pb-6">
+
+  <!-- 頂部近距離通知橫幅 (預設隱藏) -->
+  <div id="proximity-alert" class="fixed top-4 left-1/2 -translate-x-1/2 z-[2000] w-[92%] max-w-md hidden">
+    <div class="sketch-box bg-[#FFF4CC] p-4 flex items-center gap-3 border-[#3D312A]">
+      <div class="text-4xl animate-bounce">🦁</div>
+      <div class="flex-1">
+        <div class="text-xs font-bold text-[#E05A47] uppercase tracking-wider">✨ 發現野生風獅爺！</div>
+        <h4 id="alert-title" class="font-black text-lg text-[#3D312A]">瓊林風獅爺 就在附近！</h4>
+        <p id="alert-desc" class="text-xs text-stone-600">距離不到 150 公尺，快去拍照蓋章吧！</p>
+      </div>
+      <button onclick="collectFromAlert()" class="sketch-btn bg-[#E05A47] text-white px-3 py-2 text-xs font-bold whitespace-nowrap">
+        立即蓋章
+      </button>
+      <button onclick="closeAlert()" class="text-stone-400 hover:text-stone-700 font-bold text-lg px-1">✕</button>
+    </div>
+  </div>
+
+  <!-- 頂部手繪標題與進度列 -->
+  <header class="max-w-6xl w-full mx-auto px-4 pt-4 pb-2">
+    <div class="sketch-box bg-[#FFFBF0] p-4 relative">
+      <div class="washi-tape"></div>
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        
+        <!-- 標題與小圖示 -->
+        <div class="flex items-center gap-3">
+          <div id="header-lion-icon" class="w-14 h-14 flex-shrink-0 wobble-hover"></div>
+          <div>
+            <div class="inline-block bg-[#E05A47] text-white text-xs font-bold px-2 py-0.5 rounded-full border border-[#3D312A] mb-1">
+              KINMEN LION QUEST
+            </div>
+            <h1 class="text-2xl md:text-3xl font-black tracking-tight text-[#3D312A]">
+              金門風獅爺尋寶手札
+            </h1>
+          </div>
+        </div>
+
+        <!-- 收集進度與定位控制 -->
+        <div class="flex flex-wrap items-center gap-3">
+          <!-- 進度條小卡 -->
+          <div class="sketch-box-sm bg-[#FDF8EC] px-3.5 py-2 flex items-center gap-3 flex-1 md:flex-initial">
+            <div>
+              <div class="text-xs font-bold text-stone-500">手帳收集進度</div>
+              <div class="text-lg font-black text-[#3D312A]">
+                <span id="collected-count" class="text-[#E05A47] text-xl">0</span> / <span id="total-count">8</span> 尊
+              </div>
+            </div>
+            <div class="w-24 h-4 bg-stone-200 rounded-full border-2 border-[#3D312A] overflow-hidden p-0.5">
+              <div id="progress-bar" class="h-full bg-[#68A678] rounded-full transition-all duration-500" style="width: 0%"></div>
+            </div>
+          </div>
+
+          <!-- GPS 開關按鈕 -->
+          <button id="gps-btn" onclick="toggleGPS()" class="sketch-btn bg-[#FFE082] hover:bg-[#FFD54F] px-4 py-2.5 text-sm font-black flex items-center gap-1.5">
+            <span id="gps-dot" class="w-2.5 h-2.5 rounded-full bg-stone-500 border border-[#3D312A]"></span>
+            <span id="gps-text">開啟 GPS 雷達</span>
+          </button>
+
+          <!-- 重置按鈕 -->
+          <button onclick="resetProgress()" title="重置收集紀錄" class="sketch-btn bg-stone-100 hover:bg-stone-200 px-3 py-2.5 text-xs font-bold text-stone-600">
+            🔄 重置
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- 主內容區：左側地圖 + 右側風獅爺圖鑑手札 -->
+  <main class="max-w-6xl w-full mx-auto px-4 mt-2 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-5">
+    
+    <!-- 左欄：手繪尋寶地圖 (佔 7 欄) -->
+    <section class="lg:col-span-7 flex flex-col">
+      <div class="sketch-box p-3 bg-[#FFFDF9] flex-1 flex flex-col relative min-h-[380px] lg:min-h-[560px]">
+        <!-- 地圖上方工具列 -->
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-2 px-1">
+          <div class="flex items-center gap-2">
+            <span class="text-sm font-black bg-[#68A678] text-white px-2.5 py-0.5 rounded-md border-2 border-[#3D312A]">
+              🗺️ 尋寶地圖
+            </span>
+            <span id="location-status" class="text-xs font-bold text-stone-500">
+              📍 預設中心：金門大學周邊
+            </span>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <button onclick="resetMapCenter()" class="sketch-btn bg-[#FDF8EC] px-2.5 py-1 text-xs font-bold">
+              🎯 回到金門全覽
+            </button>
+          </div>
+        </div>
+
+        <!-- Leaflet 地圖容器 -->
+        <div id="map" class="w-full flex-1 rounded-xl border-2 border-[#3D312A] z-10 min-h-[330px]"></div>
+
+        <!-- 地圖圖例與小提示 -->
+        <div class="mt-2.5 flex flex-wrap items-center justify-between gap-2 text-xs text-stone-600 px-1">
+          <div class="flex items-center gap-3 font-bold">
+            <span class="flex items-center gap-1">
+              <span class="inline-block w-3 h-3 rounded-full bg-[#E05A47] border border-[#3D312A]"></span> 已蓋章收集
+            </span>
+            <span class="flex items-center gap-1">
+              <span class="inline-block w-3 h-3 rounded-full bg-[#9E9E9E] border border-[#3D312A]"></span> 尚未收集
+            </span>
+            <span class="flex items-center gap-1">
+              <span class="inline-block w-3 h-3 rounded-full bg-[#3B82F6] border border-[#3D312A]"></span> 你的位置 (150m 感應圈)
+            </span>
+          </div>
+          <span class="text-[11px] bg-amber-100 border border-amber-400 px-2 py-0.5 rounded font-bold text-amber-900">
+            💡 點擊卡片「✨ 模擬走到附近」可測試到站通知！
+          </span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 右欄：風獅爺收集手札 (佔 5 欄) -->
+    <section class="lg:col-span-5 flex flex-col">
+      <div class="sketch-box p-4 bg-[#FFFDF9] flex-1 flex flex-col max-h-[620px]">
+        
+        <!-- 篩選分類標籤 -->
+        <div class="flex items-center justify-between gap-2 mb-3 pb-2 border-b-2 border-dashed border-stone-300">
+          <h2 class="text-lg font-black flex items-center gap-1.5">
+            📖 風獅爺圖鑑手札
+          </h2>
+          <div class="flex gap-1">
+            <button onclick="setFilter('all')" id="filter-all" class="sketch-btn px-2.5 py-1 text-xs font-black bg-[#E05A47] text-white">
+              全部 (8)
+            </button>
+            <button onclick="setFilter('collected')" id="filter-collected" class="sketch-btn px-2.5 py-1 text-xs font-bold bg-[#FDF8EC]">
+              已收集
+            </button>
+            <button onclick="setFilter('uncollected')" id="filter-uncollected" class="sketch-btn px-2.5 py-1 text-xs font-bold bg-[#FDF8EC]">
+              未尋獲
+            </button>
+          </div>
+        </div>
+
+        <!-- 卡片滾動列表 -->
+        <div id="lion-list" class="flex-1 overflow-y-auto pr-1 space-y-3.5">
+          <!-- 由 JavaScript 動態渲染 -->
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    // ==========================================
+    // 1. 金門知名風獅爺資料庫 (8尊代表性風獅爺)
+    // ==========================================
+    const WIND_LIONS = [
+      {
+        id: 'qionglin',
+        name: '瓊林風獅爺',
+        township: '金湖鎮',
+        height: '188 公分 (石雕立姿)',
+        feature: '披著帥氣紅披風、手持令旗，是金門人氣最高的觀光地標之一！',
+        lat: 24.4552,
+        lng: 118.3728,
+        color: '#E05A47',     // 磚紅
+        capeColor: '#D62828', // 紅披風
+        accessory: '令旗'
+      },
+      {
+        id: 'anqi',
+        name: '安岐風獅爺',
+        township: '金寧鄉',
+        height: '378 公分 (泥塑立姿)',
+        feature: '全金門最高大的風獅爺！青綠色身軀配大紅披風，氣勢十足。',
+        lat: 24.4688,
+        lng: 118.3168,
+        color: '#4D9078',     // 青綠
+        capeColor: '#E63946',
+        accessory: '帥印'
+      },
+      {
+        id: 'shuitou',
+        name: '水頭風獅爺',
+        township: '金城鎮',
+        height: '122 公分 (石雕蹲距)',
+        feature: '位於得月樓聚落附近，裂嘴大笑的模樣超級討喜親切。',
+        lat: 24.4126,
+        lng: 118.2974,
+        color: '#D99B52',     // 暖沙黃
+        capeColor: '#F4A261',
+        accessory: '繡球'
+      },
+      {
+        id: 'oucuo',
+        name: '歐厝風獅爺',
+        township: '金城鎮',
+        height: '132 公分 (石雕蹲距)',
+        feature: '坐落在歐厝海灘步道旁，圓滾滾的大眼睛像戴了潛水鏡一樣可愛。',
+        lat: 24.4071,
+        lng: 118.3422,
+        color: '#8D99AE',     // 石青灰
+        capeColor: '#E05A47',
+        accessory: '元寶'
+      },
+      {
+        id: 'beishan',
+        name: '北山風獅爺',
+        township: '金寧鄉',
+        height: '112 公分 (石雕立姿)',
+        feature: '古寧頭北山聚落的守護神，表情威嚴中帶著呆萌感，手持小令旗。',
+        lat: 24.4783,
+        lng: 118.3125,
+        color: '#C97A63',     // 陶土紅
+        capeColor: '#E9C46A',
+        accessory: '令旗'
+      },
+      {
+        id: 'shanhou',
+        name: '山后風獅爺',
+        township: '金沙鎮',
+        height: '172 公分 (石雕立姿)',
+        feature: '守護山后民俗文化村，身體彩繪鮮豔，濃眉大眼非常有精神！',
+        lat: 24.5021,
+        lng: 118.4426,
+        color: '#457B9D',     // 靛藍
+        capeColor: '#E63946',
+        accessory: '鈴鐺'
+      },
+      {
+        id: 'tahou',
+        name: '塔后風獅爺',
+        township: '金湖鎮',
+        height: '62 公分 (石雕蹲距)',
+        feature: '體型嬌小玲瓏，胸前掛著可愛鈴鐺，耳朵圓圓的像小狗狗。',
+        lat: 24.4423,
+        lng: 118.4148,
+        color: '#E5989B',     // 粉珊瑚
+        capeColor: '#FFB703',
+        accessory: '紅彩球'
+      },
+      {
+        id: 'liuluo',
+        name: '劉澳風獅爺',
+        township: '金沙鎮',
+        height: '126 公分 (泥塑蹲距)',
+        feature: '臉頰鼓鼓、全身塗滿明亮色彩，是攝影玩家最愛的可愛風獅爺之一。',
+        lat: 24.4675,
+        lng: 118.4192,
+        color: '#F2B705',     // 亮金黃
+        capeColor: '#D62828',
+        accessory: '令印'
+      }
+    ];
+
+    // ==========================================
+    // 2. 遊戲狀態與儲存管理
+    // ==========================================
+    const STORAGE_KEY = 'kinmen_windlion_collected_v1';
+    let collectedIds = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+    let currentFilter = 'all';
+    
+    // 預設座標：國立金門大學周邊 (24.4485, 118.3225)
+    let userPos = { lat: 24.4485, lng: 118.3225 };
+    let watchId = null;
+    let isGpsActive = false;
+    let currentAlertLionId = null;
+    let notifiedSet = new Set(); // 避免同一次靠近重複狂跳通知
+
+    // Leaflet 實例與圖層
+    let map = null;
+    let markers = {};
+    let userMarker = null;
+    let userCircle = null;
+
+    // ==========================================
+    // 3. 手繪風 Q 版風獅爺 SVG 產生器
+    // ==========================================
+    function generateLionSVG(lion, isCollected = true, size = 64) {
+      const mainColor = isCollected ? lion.color : '#B8B2A6';
+      const capeColor = isCollected ? lion.capeColor : '#8C857B';
+      const cheekColor = isCollected ? '#FF8FA3' : '#9E988E';
+
+      return `
+        <svg width="${size}" height="${size}" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- 紅色神明披風 -->
+          <path d="M16 68 C8 85, 18 96, 50 96 C82 96, 92 85, 84 68 Z" fill="${capeColor}" stroke="#3D312A" stroke-width="4" stroke-linejoin="round"/>
+          <!-- 捲捲鬃毛外圈 -->
+          <path d="M22 45 C12 36, 18 22, 30 24 C34 12, 48 12, 50 20 C52 12, 66 12, 70 24 C82 22, 88 36, 78 45 C88 55, 82 70, 70 68 C65 78, 35 78, 30 68 C18 70, 12 55, 22 45 Z" fill="${mainColor}" stroke="#3D312A" stroke-width="4" stroke-linejoin="round"/>
+          <!-- 獅子臉龐 -->
+          <rect x="27" y="30" width="46" height="38" rx="16" fill="#FFFDF7" stroke="#3D312A" stroke-width="3.5"/>
+          <!-- 大眼睛 -->
+          <circle cx="39" cy="44" r="6" fill="#3D312A"/>
+          <circle cx="37" cy="42" r="2" fill="#FFFFFF"/>
+          <circle cx="61" cy="44" r="6" fill="#3D312A"/>
+          <circle cx="59" cy="42" r="2" fill="#FFFFFF"/>
+          <!-- 粗眉毛 -->
+          <path d="M31 35 Q39 30 45 36" stroke="#3D312A" stroke-width="3.5" stroke-linecap="round"/>
+          <path d="M69 35 Q61 30 55 36" stroke="#3D312A" stroke-width="3.5" stroke-linecap="round"/>
+          <!-- 大鼻子 -->
+          <ellipse cx="50" cy="49" rx="6" ry="4" fill="${capeColor}" stroke="#3D312A" stroke-width="2.5"/>
+          <!-- 裂嘴大笑與小虎牙 -->
+          <path d="M35 55 Q50 67 65 55 Z" fill="#E05A47" stroke="#3D312A" stroke-width="3" stroke-linejoin="round"/>
+          <polygon points="39,56 42,61 45,56" fill="#FFFFFF" stroke="#3D312A" stroke-width="1.5"/>
+          <polygon points="55,56 58,61 61,56" fill="#FFFFFF" stroke="#3D312A" stroke-width="1.5"/>
+          <!-- 腮紅 -->
+          <circle cx="31" cy="51" r="3.5" fill="${cheekColor}" opacity="0.8"/>
+          <circle cx="69" cy="51" r="3.5" fill="${cheekColor}" opacity="0.8"/>
+          <!-- 胸前金鈴鐺 -->
+          <circle cx="50" cy="77" r="6.5" fill="#F2B705" stroke="#3D312A" stroke-width="3"/>
+          <line x1="46" y1="77" x2="54" y2="77" stroke="#3D312A" stroke-width="2"/>
+          <circle cx="50" cy="79" r="1.5" fill="#3D312A"/>
+        </svg>
+      `;
+    }
+
+    // ==========================================
+    // 4. 音效合成器 (Web Audio API 免外部音檔)
+    // ==========================================
+    function playSound(type) {
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        if (type === 'stamp') {
+          // 蓋章輕快叮咚聲
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(523.25, ctx.currentTime); // C5
+          osc.frequency.setValueAtTime(659.25, ctx.currentTime + 0.08); // E5
+          osc.frequency.setValueAtTime(783.99, ctx.currentTime + 0.16); // G5
+          gain.gain.setValueAtTime(0.25, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.45);
+          osc.start();
+          osc.stop(ctx.currentTime + 0.45);
+        } else if (type === 'radar') {
+          // 發現風獅爺提示音
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(587.33, ctx.currentTime); // D5
+          osc.frequency.setValueAtTime(880, ctx.currentTime + 0.12); // A5
+          gain.gain.setValueAtTime(0.3, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
+          osc.start();
+          osc.stop(ctx.currentTime + 0.5);
+        }
+      } catch (e) {
+        // 忽略瀏覽器未互動前的靜音限制
+      }
+    }
+
+    // ==========================================
+    // 5. 距離計算 (Haversine 公式，回傳公尺)
+    // ==========================================
+    function getDistanceMeters(lat1, lon1, lat2, lon2) {
+      const R = 6371e3;
+      const toRad = deg => (deg * Math.PI) / 180;
+      const dLat = toRad(lat2 - lat1);
+      const dLon = toRad(lon2 - lon1);
+      const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      return Math.round(R * c);
+    }
+
+    function formatDistance(meters) {
+      if (meters < 1000) return `${meters} m`;
+      return `${(meters / 1000).toFixed(1)} km`;
+    }
+
+    // ==========================================
+    // 6. 初始化 Leaflet 地圖與標記
+    // ==========================================
+    function initMap() {
+      // 以金門島中心初始化
+      map = L.map('map', {
+        zoomControl: true
+      }).setView([24.4550, 118.3650], 12);
+
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors',
+        maxZoom: 19
+      }).addTo(map);
+
+      // 建立使用者位置標記與 150m 感應圈
+      updateUserMapMarker();
+
+      // 建立所有風獅爺地圖標記
+      renderMapMarkers();
+    }
+
+    function updateUserMapMarker() {
+      if (!map) return;
+
+      const userIcon = L.divIcon({
+        className: 'custom-user-icon',
+        html: `
+          <div class="relative flex items-center justify-center w-9 h-9">
+            <div class="absolute w-9 h-9 bg-blue-400 rounded-full animate-ping opacity-40"></div>
+            <div class="w-7 h-7 rounded-full bg-[#3B82F6] border-2 border-[#3D312A] shadow flex items-center justify-center text-white text-xs font-black">
+              我
+            </div>
+          </div>
+        `,
+        iconSize: [36, 36],
+        iconAnchor: [18, 18]
+      });
+
+      if (userMarker) {
+        userMarker.setLatLng([userPos.lat, userPos.lng]);
+        userCircle.setLatLng([userPos.lat, userPos.lng]);
+      } else {
+        userCircle = L.circle([userPos.lat, userPos.lng], {
+          radius: 150,
+          color: '#3B82F6',
+          weight: 2,
+          dashArray: '6, 6',
+          fillColor: '#60A5FA',
+          fillOpacity: 0.15
+        }).addTo(map);
+
+        userMarker = L.marker([userPos.lat, userPos.lng], { icon: userIcon, zIndexOffset: 1000 })
+          .addTo(map)
+          .bindPopup(`<div class="font-bold text-xs p-1">📍 你目前的位置<br><span class="text-stone-500">感應半徑：150公尺</span></div>`);
+      }
+    }
+
+    function renderMapMarkers() {
+      WIND_LIONS.forEach(lion => {
+        const isCollected = collectedIds.includes(lion.id);
+        const dist = getDistanceMeters(userPos.lat, userPos.lng, lion.lat, lion.lng);
+
+        const customIcon = L.divIcon({
+          className: 'lion-map-marker',
+          html: `
+            <div class="relative group cursor-pointer transition-transform hover:scale-110" style="width:48px;height:48px;">
+              <div class="w-12 h-12 rounded-full border-2 border-[#3D312A] shadow-md flex items-center justify-center ${isCollected ? 'bg-[#FFF3E0]' : 'bg-stone-200'}">
+                ${generateLionSVG(lion, isCollected, 40)}
+              </div>
+              ${isCollected ? `<span class="absolute -top-1 -right-1 bg-[#E05A47] text-white text-[10px] font-black w-5 h-5 rounded-full border border-[#3D312A] flex items-center justify-center">✓</span>` : ''}
+            </div>
+          `,
+          iconSize: [48, 48],
+          iconAnchor: [24, 24],
+          popupAnchor: [0, -22]
+        });
+
+        const popupHtml = `
+          <div class="p-2 min-w-[200px]">
+            <div class="flex items-center gap-2 mb-1">
+              <span class="text-[11px] font-bold px-2 py-0.5 rounded bg-amber-100 border border-[#3D312A]">${lion.township}</span>
+              <span class="text-xs font-bold text-stone-500">距離 ${formatDistance(dist)}</span>
+            </div>
+            <h3 class="font-black text-base text-[#3D312A]">${lion.name}</h3>
+            <p class="text-xs text-stone-600 mt-1 leading-relaxed">${lion.feature}</p>
+            <div class="mt-3 flex gap-1.5">
+              <button onclick="toggleCollect('${lion.id}')" class="sketch-btn flex-1 py-1.5 text-xs font-black ${isCollected ? 'bg-stone-200 text-stone-700' : 'bg-[#E05A47] text-white'}">
+                ${isCollected ? '✓ 已蓋章 (取消)' : '💮 蓋章收集'}
+              </button>
+              <a href="https://www.google.com/maps/dir/?api=1&destination=${lion.lat},${lion.lng}&travelmode=driving" target="_blank"
+                 class="sketch-btn bg-[#68A678] text-white px-2.5 py-1.5 text-xs font-black flex items-center justify-center">
+                🧭 導航
+              </a>
+            </div>
+          </div>
+        `;
+
+        if (markers[lion.id]) {
+          markers[lion.id].setIcon(customIcon);
+          markers[lion.id].setPopupContent(popupHtml);
+        } else {
+          markers[lion.id] = L.marker([lion.lat, lion.lng], { icon: customIcon })
+            .addTo(map)
+            .bindPopup(popupHtml);
+        }
+      });
+    }
+
+    function resetMapCenter() {
+      map.flyTo([24.4550, 118.3650], 12, { duration: 0.8 });
+    }
+
+    function focusLionOnMap(lionId) {
+      const lion = WIND_LIONS.find(l => l.id === lionId);
+      if (!lion) return;
+      map.flyTo([lion.lat, lion.lng], 15, { duration: 0.8 });
+      setTimeout(() => {
+        if (markers[lion.id]) markers[lion.id].openPopup();
+      }, 600);
+    }
+
+    // ==========================================
+    // 7. 渲染右側手繪圖鑑手札列表
+    // ==========================================
+    function renderLionList() {
+      const container = document.getElementById('lion-list');
+      
+      // 根據距離由近到遠排序
+      const sortedLions = [...WIND_LIONS].map(lion => ({
+        ...lion,
+        distance: getDistanceMeters(userPos.lat, userPos.lng, lion.lat, lion.lng),
+        isCollected: collectedIds.includes(lion.id)
+      })).sort((a, b) => a.distance - b.distance);
+
+      // 套用篩選器
+      const filtered = sortedLions.filter(lion => {
+        if (currentFilter === 'collected') return lion.isCollected;
+        if (currentFilter === 'uncollected') return !lion.isCollected;
+        return true;
+      });
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-12 text-stone-400">
+            <div class="text-4xl mb-2">🦁</div>
+            <p class="font-bold text-sm">這個分類目前還沒有風獅爺喔！</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = filtered.map(lion => {
+        const isNearby = lion.distance <= 150;
+        return `
+          <div class="sketch-box-sm p-3.5 relative transition-all ${lion.isCollected ? 'bg-[#FFFDF5]' : 'bg-[#F8F5EE]'}" id="card-${lion.id}">
+            
+            <!-- 已收集紅印章 -->
+            ${lion.isCollected ? `
+              <div class="absolute top-3 right-3 z-10 pointer-events-none">
+                <div class="stamp-badge text-xs">💮 已參拜收集</div>
+              </div>
+            ` : ''}
+
+            <div class="flex items-start gap-3">
+              <!-- 手繪風獅爺頭像 -->
+              <div onclick="focusLionOnMap('${lion.id}')" class="w-16 h-16 rounded-2xl border-2 border-[#3D312A] flex-shrink-0 flex items-center justify-center cursor-pointer ${lion.isCollected ? 'bg-[#FFF3D6]' : 'bg-stone-200'}" title="點擊在地圖上查看">
+                ${generateLionSVG(lion, lion.isCollected, 54)}
+              </div>
+
+              <!-- 資訊欄 -->
+              <div class="flex-1 min-w-0">
+                <div class="flex flex-wrap items-center gap-1.5 mb-1">
+                  <span class="text-[11px] font-black px-2 py-0.5 rounded bg-[#FFE082] border border-[#3D312A]">
+                    ${lion.township}
+                  </span>
+                  <span class="text-xs font-bold ${isNearby ? 'text-[#E05A47] animate-pulse' : 'text-stone-500'}">
+                    📍 距離 ${formatDistance(lion.distance)} ${isNearby ? '(就在身邊!)' : ''}
+                  </span>
+                </div>
+
+                <h3 onclick="focusLionOnMap('${lion.id}')" class="text-base font-black text-[#3D312A] cursor-pointer hover:underline truncate">
+                  ${lion.name}
+                </h3>
+                <p class="text-xs text-stone-500 font-bold mt-0.5">
+                  📏 ${lion.height} ｜ 持有物：${lion.accessory}
+                </p>
+                <p class="text-xs text-stone-600 mt-1 leading-relaxed">
+                  ${lion.feature}
+                </p>
+              </div>
+            </div>
+
+            <!-- 底部操作按鈕列 -->
+            <div class="mt-3 pt-2.5 border-t border-dashed border-stone-300 flex flex-wrap items-center justify-between gap-2">
+              <div class="flex items-center gap-1.5">
+                <!-- Google Maps 導航按鈕 -->
+                <a href="https://www.google.com/maps/dir/?api=1&destination=${lion.lat},${lion.lng}&travelmode=driving" target="_blank"
+                   class="sketch-btn bg-[#68A678] hover:bg-[#579266] text-white px-3 py-1.5 text-xs font-black flex items-center gap-1">
+                  🧭 導航前往
+                </a>
+
+                <!-- 模擬走到附近按鈕 (方便測試通知) -->
+                <button onclick="simulateWalkTo('${lion.id}')" class="sketch-btn bg-[#FFF4CC] hover:bg-[#FFE699] text-[#3D312A] px-2.5 py-1.5 text-xs font-bold" title="模擬GPS移動到這尊風獅爺旁邊">
+                  ✨ 模擬走到附近
+                </button>
+              </div>
+
+              <!-- 蓋章收集切換按鈕 -->
+              <button onclick="toggleCollect('${lion.id}')" class="sketch-btn px-3 py-1.5 text-xs font-black ${lion.isCollected ? 'bg-stone-200 text-stone-700' : 'bg-[#E05A47] text-white'}">
+                ${lion.isCollected ? '✓ 已收集' : '💮 蓋章收集'}
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // ==========================================
+    // 8. 收集邏輯、篩選與進度更新
+    // ==========================================
+    function toggleCollect(lionId) {
+      const idx = collectedIds.indexOf(lionId);
+      if (idx === -1) {
+        collectedIds.push(lionId);
+        playSound('stamp');
+      } else {
+        collectedIds.splice(idx, 1);
+      }
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(collectedIds));
+      updateUI();
+    }
+
+    function updateProgressUI() {
+      const count = collectedIds.length;
+      const total = WIND_LIONS.length;
+      const pct = Math.round((count / total) * 100);
+
+      document.getElementById('collected-count').textContent = count;
+      document.getElementById('total-count').textContent = total;
+      document.getElementById('progress-bar').style.width = `${pct}%`;
+
+      // 更新篩選按鈕文字
+      document.getElementById('filter-all').textContent = `全部 (${total})`;
+      document.getElementById('filter-collected').textContent = `已收集 (${count})`;
+      document.getElementById('filter-uncollected').textContent = `未尋獲 (${total - count})`;
+    }
+
+    function setFilter(filterType) {
+      currentFilter = filterType;
+      ['all', 'collected', 'uncollected'].forEach(type => {
+        const btn = document.getElementById(`filter-${type}`);
+        if (type === filterType) {
+          btn.className = 'sketch-btn px-2.5 py-1 text-xs font-black bg-[#E05A47] text-white';
+        } else {
+          btn.className = 'sketch-btn px-2.5 py-1 text-xs font-bold bg-[#FDF8EC]';
+        }
+      });
+      renderLionList();
+    }
+
+    function resetProgress() {
+      if (confirm('確定要清空手札上的所有風獅爺收集印章嗎？')) {
+        collectedIds = [];
+        notifiedSet.clear();
+        localStorage.removeItem(STORAGE_KEY);
+        updateUI();
+      }
+    }
+
+    function updateUI() {
+      updateProgressUI();
+      renderLionList();
+      renderMapMarkers();
+    }
+
+    // ==========================================
+    // 9. GPS 定位追蹤與近距離到站通知 (150m)
+    // ==========================================
+    function toggleGPS() {
+      const btnText = document.getElementById('gps-text');
+      const dot = document.getElementById('gps-dot');
+      const statusText = document.getElementById('location-status');
+
+      if (isGpsActive) {
+        if (watchId !== null) navigator.geolocation.clearWatch(watchId);
+        watchId = null;
+        isGpsActive = false;
+        btnText.textContent = '開啟 GPS 雷達';
+        dot.className = 'w-2.5 h-2.5 rounded-full bg-stone-500 border border-[#3D312A]';
+        statusText.textContent = '📍 GPS 已暫停';
+        return;
+      }
+
+      // 請求瀏覽器通知權限
+      if ('Notification' in window && Notification.permission === 'default') {
+        Notification.requestPermission();
+      }
+
+      if (!('geolocation' in navigator)) {
+        alert('你的瀏覽器不支援 GPS 定位功能，可以使用卡片上的「✨ 模擬走到附近」按鈕體驗！');
+        return;
+      }
+
+      isGpsActive = true;
+      btnText.textContent = 'GPS 雷達偵測中';
+      dot.className = 'w-2.5 h-2.5 rounded-full bg-green-500 animate-ping border border-[#3D312A]';
+      statusText.textContent = '📡 正在取得衛星定位...';
+
+      watchId = navigator.geolocation.watchPosition(
+        pos => {
+          userPos = {
+            lat: pos.coords.latitude,
+            lng: pos.coords.longitude
+          };
+          statusText.textContent = `📍 即時定位 (${userPos.lat.toFixed(4)}, ${userPos.lng.toFixed(4)})`;
+          updateUserMapMarker();
+          checkProximityAndNotify();
+          updateUI();
+        },
+        err => {
+          statusText.textContent = '⚠️ 無法取得精準定位，可使用「模擬走到附近」測試';
+        },
+        { enableHighAccuracy: true, maximumAge: 5000, timeout: 10000 }
+      );
+    }
+
+    // 模擬走到某尊風獅爺旁邊 (供電腦/室內直接體驗通知效果)
+    function simulateWalkTo(lionId) {
+      const lion = WIND_LIONS.find(l => l.id === lionId);
+      if (!lion) return;
+
+      // 將座標設在該風獅爺旁約 35 公尺處
+      userPos = {
+        lat: lion.lat - 0.00028,
+        lng: lion.lng - 0.00015
+      };
+
+      document.getElementById('location-status').textContent = `✨ 模擬位置：已抵達【${lion.name}】附近！`;
+      updateUserMapMarker();
+      map.flyTo([lion.lat, lion.lng], 16, { duration: 0.7 });
+
+      // 強制允許再次觸發該尊的通知
+      notifiedSet.delete(lion.id);
+      checkProximityAndNotify();
+      updateUI();
+    }
+
+    function checkProximityAndNotify() {
+      for (const lion of WIND_LIONS) {
+        const dist = getDistanceMeters(userPos.lat, userPos.lng, lion.lat, lion.lng);
+        const isCollected = collectedIds.includes(lion.id);
+
+        // 進入 150 公尺內且尚未蓋章
+        if (dist <= 150 && !isCollected && !notifiedSet.has(lion.id)) {
+          notifiedSet.add(lion.id);
+          triggerProximityAlert(lion, dist);
+          break;
+        }
+      }
+    }
+
+    function triggerProximityAlert(lion, dist) {
+      currentAlertLionId = lion.id;
+      playSound('radar');
+
+      // 顯示頂部手繪通知橫幅
+      const alertBox = document.getElementById('proximity-alert');
+      document.getElementById('alert-title').textContent = `${lion.name} 就在你附近！`;
+      document.getElementById('alert-desc').textContent = `目前距離約 ${dist} 公尺（${lion.township}），快去尋找祂並蓋章吧！`;
+      alertBox.classList.remove('hidden');
+
+      // 若瀏覽器允許系統通知，同步發送推播
+      if ('Notification' in window && Notification.permission === 'granted') {
+        new Notification(`🦁 發現野生風獅爺：${lion.name}！`, {
+          body: `距離你只有 ${dist} 公尺！${lion.feature}`
+        });
+      }
+    }
+
+    function collectFromAlert() {
+      if (currentAlertLionId && !collectedIds.includes(currentAlertLionId)) {
+        toggleCollect(currentAlertLionId);
+      }
+      closeAlert();
+    }
+
+    function closeAlert() {
+      document.getElementById('proximity-alert').classList.add('hidden');
+      currentAlertLionId = null;
+    }
+
+    // ==========================================
+    // 10. 啟動遊戲
+    // ==========================================
+    window.addEventListener('DOMContentLoaded', () => {
+      // 渲染標題旁的 Q 版風獅爺圖示
+      document.getElementById('header-lion-icon').innerHTML = generateLionSVG(WIND_LIONS[0], true, 56);
+      initMap();
+      updateUI();
+    });
+  </script>
+</body>
+</html>
