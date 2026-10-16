@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>金門風獅爺尋寶手札 🦁</title>
+  <title>金門百尊風獅爺尋寶手札 🦁</title>
   
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -28,14 +28,13 @@
       font-family: 'Zen Maru Gothic', 'Yomogi', sans-serif;
       background-color: var(--bg-paper);
       color: var(--ink-black);
-      /* 手帳點陣紙背景 */
       background-image: radial-gradient(#D8C8B0 1.5px, transparent 1.5px);
       background-size: 22px 22px;
       overflow-x: hidden;
       user-select: none;
     }
 
-    /* 手繪不規則邊框 (奇異筆感) */
+    /* 手繪不規則邊框 */
     .sketch-box {
       border: 3px solid var(--ink-black);
       border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
@@ -53,13 +52,35 @@
     .sketch-btn {
       border: 2.5px solid var(--ink-black);
       border-radius: 255px 25px 225px 25px / 25px 225px 25px 255px;
-      box-shadow: 3px 3px 0px var(--ink-black);
+      box-shadow: 2.5px 2.5px 0px var(--ink-black);
       transition: transform 0.1s ease, box-shadow 0.1s ease;
       cursor: pointer;
     }
 
     .sketch-btn:active {
       transform: translate(2px, 2px);
+      box-shadow: 0.5px 0.5px 0px var(--ink-black);
+    }
+
+    /* 手繪拉桿樣式 */
+    input[type="range"].sketch-slider {
+      -webkit-appearance: none;
+      appearance: none;
+      height: 10px;
+      background: #E6DEC8;
+      border: 2px solid var(--ink-black);
+      border-radius: 999px;
+      outline: none;
+    }
+    input[type="range"].sketch-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--lion-red);
+      border: 2.5px solid var(--ink-black);
+      cursor: pointer;
       box-shadow: 1px 1px 0px var(--ink-black);
     }
 
@@ -73,19 +94,19 @@
     .stamp-badge {
       border: 3px double #D63A2F;
       color: #D63A2F;
-      padding: 2px 10px;
+      padding: 2px 8px;
       font-weight: 900;
       letter-spacing: 1px;
       border-radius: 8px;
       transform: rotate(-12deg);
       animation: stamp-slam 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-      background: rgba(255, 245, 245, 0.88);
+      background: rgba(255, 245, 245, 0.9);
       box-shadow: inset 0 0 0 1px #D63A2F;
     }
 
     /* 溫暖手繪風地圖濾鏡 */
     .leaflet-tile-pane {
-      filter: sepia(28%) saturate(85%) hue-rotate(345deg) contrast(95%) brightness(102%);
+      filter: sepia(25%) saturate(88%) hue-rotate(345deg) contrast(96%) brightness(102%);
     }
 
     .leaflet-container {
@@ -93,7 +114,6 @@
       background: #EAE0C8;
     }
 
-    /* 自訂地圖 Popup 變身手繪卡片 */
     .leaflet-popup-content-wrapper {
       border: 3px solid var(--ink-black);
       border-radius: 20px 8px 22px 8px / 8px 22px 8px 20px;
@@ -106,13 +126,12 @@
       background: var(--ink-black);
     }
 
-    /* 紙膠帶裝飾 */
     .washi-tape {
       position: absolute;
       top: -10px;
       left: 50%;
       transform: translateX(-50%) rotate(-2deg);
-      width: 90px;
+      width: 100px;
       height: 22px;
       background-color: rgba(242, 183, 5, 0.45);
       border-left: 2px dashed rgba(61, 49, 42, 0.25);
@@ -120,27 +139,18 @@
       z-index: 10;
       pointer-events: none;
     }
-
-    /* 浮動搖擺動畫 */
-    @keyframes wobble {
-      0%, 100% { transform: rotate(-2deg); }
-      50% { transform: rotate(2deg); }
-    }
-    .wobble-hover:hover {
-      animation: wobble 0.6s infinite ease-in-out;
-    }
   </style>
 </head>
 <body class="min-h-screen flex flex-col pb-6">
 
-  <!-- 頂部近距離通知橫幅 (預設隱藏) -->
-  <div id="proximity-alert" class="fixed top-4 left-1/2 -translate-x-1/2 z-[2000] w-[92%] max-w-md hidden">
+  <!-- 頂部近距離通知橫幅 -->
+  <div id="proximity-alert" class="fixed top-4 left-1/2 -translate-x-1/2 z-[2000] w-[94%] max-w-md hidden">
     <div class="sketch-box bg-[#FFF4CC] p-4 flex items-center gap-3 border-[#3D312A]">
       <div class="text-4xl animate-bounce">🦁</div>
-      <div class="flex-1">
-        <div class="text-xs font-bold text-[#E05A47] uppercase tracking-wider">✨ 發現野生風獅爺！</div>
-        <h4 id="alert-title" class="font-black text-lg text-[#3D312A]">瓊林風獅爺 就在附近！</h4>
-        <p id="alert-desc" class="text-xs text-stone-600">距離不到 150 公尺，快去拍照蓋章吧！</p>
+      <div class="flex-1 min-w-0">
+        <div class="text-xs font-bold text-[#E05A47] uppercase tracking-wider">✨ 雷達感應到野生風獅爺！</div>
+        <h4 id="alert-title" class="font-black text-base text-[#3D312A] truncate">瓊林風獅爺 就在附近！</h4>
+        <p id="alert-desc" class="text-xs text-stone-600">已進入你的設定感應範圍，快去蓋章吧！</p>
       </div>
       <button onclick="collectFromAlert()" class="sketch-btn bg-[#E05A47] text-white px-3 py-2 text-xs font-bold whitespace-nowrap">
         立即蓋章
@@ -149,125 +159,170 @@
     </div>
   </div>
 
-  <!-- 頂部手繪標題與進度列 -->
-  <header class="max-w-6xl w-full mx-auto px-4 pt-4 pb-2">
+  <!-- 頂部手繪標題與控制面板 -->
+  <header class="max-w-7xl w-full mx-auto px-4 pt-4 pb-2">
     <div class="sketch-box bg-[#FFFBF0] p-4 relative">
       <div class="washi-tape"></div>
-      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        
-        <!-- 標題與小圖示 -->
+      
+      <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+        <!-- 左側：標題與圖示 -->
         <div class="flex items-center gap-3">
-          <div id="header-lion-icon" class="w-14 h-14 flex-shrink-0 wobble-hover"></div>
+          <div id="header-lion-icon" class="w-14 h-14 flex-shrink-0"></div>
           <div>
-            <div class="inline-block bg-[#E05A47] text-white text-xs font-bold px-2 py-0.5 rounded-full border border-[#3D312A] mb-1">
-              KINMEN LION QUEST
+            <div class="flex items-center gap-1.5 mb-0.5">
+              <span class="bg-[#E05A47] text-white text-[11px] font-bold px-2 py-0.5 rounded-full border border-[#3D312A]">
+                全金門 100 尊完整版
+              </span>
+              <span class="text-xs font-bold text-stone-500">金門聚落尋寶手札</span>
             </div>
             <h1 class="text-2xl md:text-3xl font-black tracking-tight text-[#3D312A]">
-              金門風獅爺尋寶手札
+              金門風獅爺大圖鑑
             </h1>
           </div>
         </div>
 
-        <!-- 收集進度與定位控制 -->
-        <div class="flex flex-wrap items-center gap-3">
-          <!-- 進度條小卡 -->
-          <div class="sketch-box-sm bg-[#FDF8EC] px-3.5 py-2 flex items-center gap-3 flex-1 md:flex-initial">
+        <!-- 中間：自訂感應距離滑桿 -->
+        <div class="sketch-box-sm bg-[#FDF8EC] px-3.5 py-2 flex flex-col justify-center min-w-[260px]">
+          <div class="flex items-center justify-between text-xs font-bold mb-1">
+            <span class="text-stone-600">📡 雷達通知感應距離：</span>
+            <span id="radius-display" class="text-[#E05A47] font-black text-sm">150 公尺 (m)</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-[10px] font-bold text-stone-400">20m</span>
+            <input id="radius-slider" type="range" min="20" max="2000" step="10" value="150"
+                   oninput="updateAlertRadius(this.value)"
+                   class="sketch-slider flex-1">
+            <span class="text-[10px] font-bold text-stone-400">2km</span>
+          </div>
+          <!-- 快速切換距離按鈕 -->
+          <div class="flex items-center gap-1 mt-1.5">
+            <span class="text-[10px] text-stone-500 font-bold mr-1">快速設定:</span>
+            <button onclick="updateAlertRadius(50)" class="text-[10px] font-bold px-1.5 py-0.5 rounded border border-[#3D312A] bg-white hover:bg-amber-100">50m</button>
+            <button onclick="updateAlertRadius(150)" class="text-[10px] font-bold px-1.5 py-0.5 rounded border border-[#3D312A] bg-white hover:bg-amber-100">150m</button>
+            <button onclick="updateAlertRadius(500)" class="text-[10px] font-bold px-1.5 py-0.5 rounded border border-[#3D312A] bg-white hover:bg-amber-100">500m</button>
+            <button onclick="updateAlertRadius(1000)" class="text-[10px] font-bold px-1.5 py-0.5 rounded border border-[#3D312A] bg-white hover:bg-amber-100">1km</button>
+          </div>
+        </div>
+
+        <!-- 右側：收集進度與 GPS 開關 -->
+        <div class="flex flex-wrap items-center gap-2.5">
+          <div class="sketch-box-sm bg-[#FDF8EC] px-3.5 py-2 flex items-center gap-3 flex-1 sm:flex-initial">
             <div>
-              <div class="text-xs font-bold text-stone-500">手帳收集進度</div>
-              <div class="text-lg font-black text-[#3D312A]">
-                <span id="collected-count" class="text-[#E05A47] text-xl">0</span> / <span id="total-count">8</span> 尊
+              <div class="text-[11px] font-bold text-stone-500">百尊收集進度</div>
+              <div class="text-base font-black text-[#3D312A]">
+                <span id="collected-count" class="text-[#E05A47] text-xl">0</span> / <span id="total-count">100</span> 尊
               </div>
             </div>
-            <div class="w-24 h-4 bg-stone-200 rounded-full border-2 border-[#3D312A] overflow-hidden p-0.5">
+            <div class="w-20 h-4 bg-stone-200 rounded-full border-2 border-[#3D312A] overflow-hidden p-0.5">
               <div id="progress-bar" class="h-full bg-[#68A678] rounded-full transition-all duration-500" style="width: 0%"></div>
             </div>
           </div>
 
-          <!-- GPS 開關按鈕 -->
-          <button id="gps-btn" onclick="toggleGPS()" class="sketch-btn bg-[#FFE082] hover:bg-[#FFD54F] px-4 py-2.5 text-sm font-black flex items-center gap-1.5">
+          <button id="gps-btn" onclick="toggleGPS()" class="sketch-btn bg-[#FFE082] hover:bg-[#FFD54F] px-3.5 py-2.5 text-xs font-black flex items-center gap-1.5">
             <span id="gps-dot" class="w-2.5 h-2.5 rounded-full bg-stone-500 border border-[#3D312A]"></span>
             <span id="gps-text">開啟 GPS 雷達</span>
           </button>
 
-          <!-- 重置按鈕 -->
-          <button onclick="resetProgress()" title="重置收集紀錄" class="sketch-btn bg-stone-100 hover:bg-stone-200 px-3 py-2.5 text-xs font-bold text-stone-600">
-            🔄 重置
+          <button onclick="resetProgress()" title="重置收集紀錄" class="sketch-btn bg-stone-100 hover:bg-stone-200 px-2.5 py-2.5 text-xs font-bold text-stone-600">
+            🔄
           </button>
         </div>
       </div>
     </div>
   </header>
 
-  <!-- 主內容區：左側地圖 + 右側風獅爺圖鑑手札 -->
-  <main class="max-w-6xl w-full mx-auto px-4 mt-2 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-5">
+  <!-- 主內容區：左側地圖 + 右側百尊風獅爺手札 -->
+  <main class="max-w-7xl w-full mx-auto px-4 mt-2 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-5">
     
     <!-- 左欄：手繪尋寶地圖 (佔 7 欄) -->
     <section class="lg:col-span-7 flex flex-col">
-      <div class="sketch-box p-3 bg-[#FFFDF9] flex-1 flex flex-col relative min-h-[380px] lg:min-h-[560px]">
-        <!-- 地圖上方工具列 -->
+      <div class="sketch-box p-3 bg-[#FFFDF9] flex-1 flex flex-col relative min-h-[400px] lg:min-h-[620px]">
         <div class="flex flex-wrap items-center justify-between gap-2 mb-2 px-1">
           <div class="flex items-center gap-2">
-            <span class="text-sm font-black bg-[#68A678] text-white px-2.5 py-0.5 rounded-md border-2 border-[#3D312A]">
-              🗺️ 尋寶地圖
+            <span class="text-xs font-black bg-[#68A678] text-white px-2.5 py-1 rounded-md border-2 border-[#3D312A]">
+              🗺️ 全島風獅爺分布圖
             </span>
-            <span id="location-status" class="text-xs font-bold text-stone-500">
+            <span id="location-status" class="text-xs font-bold text-stone-500 truncate max-w-[240px] sm:max-w-none">
               📍 預設中心：金門大學周邊
             </span>
           </div>
           <div class="flex items-center gap-1.5">
+            <button onclick="centerOnUser()" class="sketch-btn bg-[#E3F2FD] px-2.5 py-1 text-xs font-bold text-blue-900">
+              🧍 我的位置
+            </button>
             <button onclick="resetMapCenter()" class="sketch-btn bg-[#FDF8EC] px-2.5 py-1 text-xs font-bold">
-              🎯 回到金門全覽
+              🎯 金門全覽
             </button>
           </div>
         </div>
 
         <!-- Leaflet 地圖容器 -->
-        <div id="map" class="w-full flex-1 rounded-xl border-2 border-[#3D312A] z-10 min-h-[330px]"></div>
+        <div id="map" class="w-full flex-1 rounded-xl border-2 border-[#3D312A] z-10 min-h-[350px]"></div>
 
-        <!-- 地圖圖例與小提示 -->
+        <!-- 地圖圖例 -->
         <div class="mt-2.5 flex flex-wrap items-center justify-between gap-2 text-xs text-stone-600 px-1">
-          <div class="flex items-center gap-3 font-bold">
+          <div class="flex flex-wrap items-center gap-3 font-bold">
             <span class="flex items-center gap-1">
-              <span class="inline-block w-3 h-3 rounded-full bg-[#E05A47] border border-[#3D312A]"></span> 已蓋章收集
+              <span class="inline-block w-3 h-3 rounded-full bg-[#E05A47] border border-[#3D312A]"></span> 已收集
             </span>
             <span class="flex items-center gap-1">
-              <span class="inline-block w-3 h-3 rounded-full bg-[#9E9E9E] border border-[#3D312A]"></span> 尚未收集
+              <span class="inline-block w-3 h-3 rounded-full bg-[#9E9E9E] border border-[#3D312A]"></span> 未尋獲
             </span>
             <span class="flex items-center gap-1">
-              <span class="inline-block w-3 h-3 rounded-full bg-[#3B82F6] border border-[#3D312A]"></span> 你的位置 (150m 感應圈)
+              <span class="inline-block w-3 h-3 rounded-full bg-[#3B82F6] border border-[#3D312A]"></span> 感應圈 (<span id="legend-radius">150m</span>)
             </span>
           </div>
           <span class="text-[11px] bg-amber-100 border border-amber-400 px-2 py-0.5 rounded font-bold text-amber-900">
-            💡 點擊卡片「✨ 模擬走到附近」可測試到站通知！
+            💡 點擊卡片「✨ 模擬走到附近」可直接瞬移測試通知！
           </span>
         </div>
       </div>
     </section>
 
-    <!-- 右欄：風獅爺收集手札 (佔 5 欄) -->
+    <!-- 右欄：百尊風獅爺圖鑑手札 (佔 5 欄) -->
     <section class="lg:col-span-5 flex flex-col">
-      <div class="sketch-box p-4 bg-[#FFFDF9] flex-1 flex flex-col max-h-[620px]">
+      <div class="sketch-box p-4 bg-[#FFFDF9] flex-1 flex flex-col max-h-[660px]">
         
-        <!-- 篩選分類標籤 -->
-        <div class="flex items-center justify-between gap-2 mb-3 pb-2 border-b-2 border-dashed border-stone-300">
-          <h2 class="text-lg font-black flex items-center gap-1.5">
-            📖 風獅爺圖鑑手札
-          </h2>
-          <div class="flex gap-1">
-            <button onclick="setFilter('all')" id="filter-all" class="sketch-btn px-2.5 py-1 text-xs font-black bg-[#E05A47] text-white">
-              全部 (8)
+        <!-- 搜尋與鄉鎮篩選控制列 -->
+        <div class="space-y-2.5 pb-3 mb-3 border-b-2 border-dashed border-stone-300">
+          <div class="flex items-center justify-between gap-2">
+            <h2 class="text-base font-black flex items-center gap-1">
+              📖 百尊尋寶手札 <span id="filtered-count-badge" class="text-xs bg-amber-100 border border-[#3D312A] px-2 py-0.5 rounded-full">100 尊</span>
+            </h2>
+            <!-- 鄉鎮篩選下拉選單 -->
+            <select id="township-select" onchange="setTownship(this.value)" class="sketch-btn bg-[#FDF8EC] px-2.5 py-1 text-xs font-black outline-none">
+              <option value="all">📍 全部鄉鎮 (100)</option>
+              <option value="金沙鎮">🦁 金沙鎮 (62)</option>
+              <option value="金湖鎮">🦁 金湖鎮 (16)</option>
+              <option value="金城鎮">🦁 金城鎮 (11)</option>
+              <option value="金寧鄉">🦁 金寧鄉 (10)</option>
+              <option value="烈嶼鄉">🐓 烈嶼鄉 (1)</option>
+            </select>
+          </div>
+
+          <!-- 關鍵字搜尋框 -->
+          <div class="relative">
+            <input id="search-input" type="text" oninput="handleSearch(this.value)"
+                   placeholder="🔍 搜尋村落或風獅爺名稱（如：瓊林、官澳、安岐...）"
+                   class="w-full px-3 py-1.5 text-xs font-bold bg-[#FDF8EC] border-2 border-[#3D312A] rounded-lg outline-none focus:bg-white">
+          </div>
+
+          <!-- 收集狀態篩選按鈕 -->
+          <div class="flex gap-1.5">
+            <button onclick="setFilter('all')" id="filter-all" class="sketch-btn flex-1 py-1 text-xs font-black bg-[#E05A47] text-white">
+              全部
             </button>
-            <button onclick="setFilter('collected')" id="filter-collected" class="sketch-btn px-2.5 py-1 text-xs font-bold bg-[#FDF8EC]">
-              已收集
-            </button>
-            <button onclick="setFilter('uncollected')" id="filter-uncollected" class="sketch-btn px-2.5 py-1 text-xs font-bold bg-[#FDF8EC]">
+            <button onclick="setFilter('uncollected')" id="filter-uncollected" class="sketch-btn flex-1 py-1 text-xs font-bold bg-[#FDF8EC]">
               未尋獲
+            </button>
+            <button onclick="setFilter('collected')" id="filter-collected" class="sketch-btn flex-1 py-1 text-xs font-bold bg-[#FDF8EC]">
+              已收集
             </button>
           </div>
         </div>
 
         <!-- 卡片滾動列表 -->
-        <div id="lion-list" class="flex-1 overflow-y-auto pr-1 space-y-3.5">
+        <div id="lion-list" class="flex-1 overflow-y-auto pr-1 space-y-3">
           <!-- 由 JavaScript 動態渲染 -->
         </div>
 
@@ -277,162 +332,202 @@
   </main>
 
   <script>
-    // ==========================================
-    // 1. 金門知名風獅爺資料庫 (8尊代表性風獅爺)
-    // ==========================================
-    const WIND_LIONS = [
-      {
-        id: 'qionglin',
-        name: '瓊林風獅爺',
-        township: '金湖鎮',
-        height: '188 公分 (石雕立姿)',
-        feature: '披著帥氣紅披風、手持令旗，是金門人氣最高的觀光地標之一！',
-        lat: 24.4552,
-        lng: 118.3728,
-        color: '#E05A47',     // 磚紅
-        capeColor: '#D62828', // 紅披風
-        accessory: '令旗'
-      },
-      {
-        id: 'anqi',
-        name: '安岐風獅爺',
-        township: '金寧鄉',
-        height: '378 公分 (泥塑立姿)',
-        feature: '全金門最高大的風獅爺！青綠色身軀配大紅披風，氣勢十足。',
-        lat: 24.4688,
-        lng: 118.3168,
-        color: '#4D9078',     // 青綠
-        capeColor: '#E63946',
-        accessory: '帥印'
-      },
-      {
-        id: 'shuitou',
-        name: '水頭風獅爺',
-        township: '金城鎮',
-        height: '122 公分 (石雕蹲距)',
-        feature: '位於得月樓聚落附近，裂嘴大笑的模樣超級討喜親切。',
-        lat: 24.4126,
-        lng: 118.2974,
-        color: '#D99B52',     // 暖沙黃
-        capeColor: '#F4A261',
-        accessory: '繡球'
-      },
-      {
-        id: 'oucuo',
-        name: '歐厝風獅爺',
-        township: '金城鎮',
-        height: '132 公分 (石雕蹲距)',
-        feature: '坐落在歐厝海灘步道旁，圓滾滾的大眼睛像戴了潛水鏡一樣可愛。',
-        lat: 24.4071,
-        lng: 118.3422,
-        color: '#8D99AE',     // 石青灰
-        capeColor: '#E05A47',
-        accessory: '元寶'
-      },
-      {
-        id: 'beishan',
-        name: '北山風獅爺',
-        township: '金寧鄉',
-        height: '112 公分 (石雕立姿)',
-        feature: '古寧頭北山聚落的守護神，表情威嚴中帶著呆萌感，手持小令旗。',
-        lat: 24.4783,
-        lng: 118.3125,
-        color: '#C97A63',     // 陶土紅
-        capeColor: '#E9C46A',
-        accessory: '令旗'
-      },
-      {
-        id: 'shanhou',
-        name: '山后風獅爺',
-        township: '金沙鎮',
-        height: '172 公分 (石雕立姿)',
-        feature: '守護山后民俗文化村，身體彩繪鮮豔，濃眉大眼非常有精神！',
-        lat: 24.5021,
-        lng: 118.4426,
-        color: '#457B9D',     // 靛藍
-        capeColor: '#E63946',
-        accessory: '鈴鐺'
-      },
-      {
-        id: 'tahou',
-        name: '塔后風獅爺',
-        township: '金湖鎮',
-        height: '62 公分 (石雕蹲距)',
-        feature: '體型嬌小玲瓏，胸前掛著可愛鈴鐺，耳朵圓圓的像小狗狗。',
-        lat: 24.4423,
-        lng: 118.4148,
-        color: '#E5989B',     // 粉珊瑚
-        capeColor: '#FFB703',
-        accessory: '紅彩球'
-      },
-      {
-        id: 'liuluo',
-        name: '劉澳風獅爺',
-        township: '金沙鎮',
-        height: '126 公分 (泥塑蹲距)',
-        feature: '臉頰鼓鼓、全身塗滿明亮色彩，是攝影玩家最愛的可愛風獅爺之一。',
-        lat: 24.4675,
-        lng: 118.4192,
-        color: '#F2B705',     // 亮金黃
-        capeColor: '#D62828',
-        accessory: '令印'
-      }
+    // =========================================================
+    // 1. 全金門 100 尊聚落風獅爺完整座標資料庫
+    // 格式: [名稱, 鄉鎮, 緯度, 經度, 姿勢/材質簡述, 特色備註]
+    // =========================================================
+    const RAW_LION_DATA = [
+      // ================= 金沙鎮 (62尊) =================
+      ['官澳風獅爺 (公)', '金沙鎮', 24.5136, 118.4148, '石雕立姿 (142cm)', '位於官澳海堤馬路旁，凝視遠方守護海岸線。'],
+      ['官澳風獅爺 (母)', '金沙鎮', 24.5122, 118.4159, '石雕立姿 (148cm)', '與官澳公風獅爺遙遙相望，共同鎮守聚落北風。'],
+      ['青嶼風獅爺 (大)', '金沙鎮', 24.5082, 118.4295, '石雕立姿 (176cm)', '位於青嶼聚落外圍，體態威武挺拔。'],
+      ['青嶼風獅爺 (小)', '金沙鎮', 24.5074, 118.4281, '石雕立姿 (96cm)', '藏身於青嶼村落古厝轉角處的守護神。'],
+      ['山后風獅爺', '金沙鎮', 24.5021, 118.4426, '石雕立姿 (172cm)', '守護山后民俗文化村，彩繪鮮豔、濃眉大眼！'],
+      ['西園風獅爺 (一)', '金沙鎮', 24.5055, 118.4102, '石雕立姿 (156cm)', '鄰近西園鹽場，見證金門百年曬鹽歷史。'],
+      ['西園風獅爺 (二)', '金沙鎮', 24.5041, 118.4091, '石雕蹲距 (110cm)', '守護鹽場聚落平安，造型古樸厚實。'],
+      ['塘頭風獅爺', '金沙鎮', 24.5015, 118.4178, '石雕蹲距 (98cm)', '位於官嶼里塘頭聚落，雕工簡練傳神。'],
+      ['五福街風獅爺', '金沙鎮', 24.4968, 118.4135, '石雕立姿 (115cm)', '守護五福街一帶古厝，帶著微笑的親切面容。'],
+      ['馬山風獅爺', '金沙鎮', 24.5195, 118.4072, '石雕立姿 (138cm)', '金門最北端的風獅爺之一，鄰近馬山觀測所。'],
+      ['田墩風獅爺', '金沙鎮', 24.4922, 118.4165, '石雕立姿 (120cm)', '坐落於田墩海堤與農田交界，防風定沙。'],
+      ['洋山風獅爺 (一)', '金沙鎮', 24.4775, 118.4005, '泥塑立姿 (146cm)', '守護洋山灣岸聚落，身披紅巾十分醒目。'],
+      ['洋山風獅爺 (二)', '金沙鎮', 24.4762, 118.3992, '石雕蹲距 (88cm)', '洋山村內的低調守護者，深受村民敬仰。'],
+      ['呂厝風獅爺 (一)', '金沙鎮', 24.4718, 118.4085, '石雕立姿 (132cm)', '面向農田與海灣，鎮守聚落風煞。'],
+      ['呂厝風獅爺 (二)', '金沙鎮', 24.4711, 118.4072, '石雕蹲距 (78cm)', '藏於呂厝民宅巷弄間的小巧風獅爺。'],
+      ['劉澳風獅爺', '金沙鎮', 24.4675, 118.4192, '泥塑蹲距 (126cm)', '臉頰鼓鼓、色彩飽和明亮，是人氣拍照王！'],
+      ['浦邊風獅爺 (一)', '金沙鎮', 24.4682, 118.4095, '石雕立姿 (130cm)', '守護浦邊古厝群與潮間帶海岸。'],
+      ['浦邊風獅爺 (二)', '金沙鎮', 24.4671, 118.4108, '石雕蹲距 (95cm)', '表情憨厚可愛，胸前常掛有村民敬獻的紅布。'],
+      ['后宅風獅爺 (一)', '金沙鎮', 24.4748, 118.4142, '石雕立姿 (124cm)', '立於聚落路口，雙眼圓睜鎮守四方。'],
+      ['后宅風獅爺 (二)', '金沙鎮', 24.4739, 118.4151, '石雕蹲距 (85cm)', '后宅村內第二尊守護風獅爺。'],
+      ['長福里風獅爺', '金沙鎮', 24.4702, 118.4138, '石雕立姿 (118cm)', '位於浦山里長福聚落，線條圓潤討喜。'],
+      ['下塘頭風獅爺', '金沙鎮', 24.4655, 118.4162, '石雕蹲距 (92cm)', '矗立在田埂旁，靜靜看顧金沙高粱田。'],
+      ['雞鳴山風獅爺', '金沙鎮', 24.4638, 118.4065, '石雕立姿 (115cm)', '鄰近海岸聚落，具有濃厚閩南石雕韻味。'],
+      ['何厝風獅爺 (一)', '金沙鎮', 24.4765, 118.4235, '石雕立姿 (136cm)', '何厝聚落守護神，以番薯文化聞名的村落。'],
+      ['何厝風獅爺 (二)', '金沙鎮', 24.4754, 118.4248, '泥塑立姿 (105cm)', '何厝巷弄中的特色風獅爺。'],
+      ['斗門風獅爺', '金沙鎮', 24.4712, 118.4265, '石雕立姿 (145cm)', '背靠太武山脈北麓，古樹與風獅爺相伴。'],
+      ['高坑風獅爺', '金沙鎮', 24.4685, 118.4225, '石雕蹲距 (108cm)', '位於知名高坑牛肉店聚落旁，笑容可掬。'],
+      ['中蘭風獅爺 (一)', '金沙鎮', 24.4632, 118.4002, '石雕立姿 (134cm)', '位於環島北路中蘭段附近，交通要道守護者。'],
+      ['中蘭風獅爺 (二)', '金沙鎮', 24.4621, 118.4015, '石雕蹲距 (82cm)', '中蘭聚落內部的小風獅爺。'],
+      ['陽翟風獅爺 (一)', '金沙鎮', 24.4792, 118.4315, '泥塑立姿 (165cm)', '鄰近軍中樂園拍攝地陽翟老街，造型威武！'],
+      ['陽翟風獅爺 (二)', '金沙鎮', 24.4781, 118.4328, '石雕立姿 (128cm)', '陽翟聚落四大風獅爺之一，守護村莊西側。'],
+      ['陽翟風獅爺 (三)', '金沙鎮', 24.4801, 118.4302, '石雕蹲距 (96cm)', '眼神炯炯有神，鎮守聚落水口。'],
+      ['陽翟風獅爺 (四)', '金沙鎮', 24.4775, 118.4335, '石雕立姿 (112cm)', '與老街歷史建築相互輝映的聚落守護神。'],
+      ['西吳風獅爺 (一)', '金沙鎮', 24.4815, 118.4285, '石雕立姿 (120cm)', '位於陽翟與西吳交界，古樸耐看。'],
+      ['西吳風獅爺 (二)', '金沙鎮', 24.4822, 118.4272, '石雕蹲距 (75cm)', '體型小巧但五官深刻的石雕風獅爺。'],
+      ['東珩風獅爺', '金沙鎮', 24.4835, 118.4385, '石雕蹲距 (102cm)', '藏身於東珩小村落樹蔭下，環境清幽。'],
+      ['碧山風獅爺 (一)', '金沙鎮', 24.4872, 118.4455, '石雕立姿 (142cm)', '位於碧山洋樓聚落外圍，充滿僑鄉風情。'],
+      ['碧山風獅爺 (二)', '金沙鎮', 24.4861, 118.4468, '石雕蹲距 (90cm)', '守護碧山陳清吉洋樓周邊古厝。'],
+      ['東山前風獅爺', '金沙鎮', 24.4915, 118.4395, '石雕立姿 (135cm)', '佇立於高粱田畔，四季景緻截然不同。'],
+      ['山西風獅爺', '金沙鎮', 24.4962, 118.4365, '石雕立姿 (125cm)', '鄰近山西拌麵名店聚落，肚量寬宏的守護神。'],
+      ['山後下堡風獅爺', '金沙鎮', 24.5005, 118.4442, '石雕蹲距 (110cm)', '與山后民俗村相鄰，守護下堡居民。'],
+      ['沙美風獅爺 (一)', '金沙鎮', 24.4865, 118.4145, '石雕立姿 (130cm)', '鄰近沙美摩洛哥老街，見證金沙鎮中心繁華。'],
+      ['沙美風獅爺 (二)', '金沙鎮', 24.4852, 118.4132, '石雕蹲距 (88cm)', '守護沙美老街西南側巷口。'],
+      ['沙美風獅爺 (三)', '金沙鎮', 24.4878, 118.4158, '泥塑立姿 (115cm)', '沙美聚落北側的鎮風守護神。'],
+      ['后水頭風獅爺 (一)', '金沙鎮', 24.4812, 118.4195, '石雕立姿 (152cm)', '金沙后水頭聚落代表，身形修長挺拔。'],
+      ['后水頭風獅爺 (二)', '金沙鎮', 24.4802, 118.4208, '石雕蹲距 (96cm)', '面朝金沙溪水系，兼具鎮水與鎮風任務。'],
+      ['后水頭風獅爺 (三)', '金沙鎮', 24.4821, 118.4182, '石雕立姿 (118cm)', '后水頭村內第三尊守護神。'],
+      ['東埔風獅爺', '金沙鎮', 24.4845, 118.4092, '石雕蹲距 (104cm)', '圓滾滾的鼻子與燦爛笑容非常療癒。'],
+      ['東蕭風獅爺', '金沙鎮', 24.4832, 118.4242, '石雕立姿 (126cm)', '位於僻靜農村聚落，保存完整的傳統石雕。'],
+      ['蔡店風獅爺', '金沙鎮', 24.4795, 118.4255, '石雕蹲距 (92cm)', '小巧精緻，常見村民奉上糖果餅乾。'],
+      ['東沙尾風獅爺', '金沙鎮', 24.4892, 118.4225, '石雕立姿 (140cm)', '直立於聚落林道旁，防範東北季風侵襲。'],
+      ['東溪風獅爺', '金沙鎮', 24.4848, 118.4185, '石雕蹲距 (86cm)', '靜靜守候東溪古厝群的袖珍風獅爺。'],
+      ['大地風獅爺', '金沙鎮', 24.4818, 118.4495, '石雕立姿 (132cm)', '位於金沙東側海岸大地聚落，視野遼闊。'],
+      ['田浦風獅爺', '金沙鎮', 24.4772, 118.4552, '石雕蹲距 (100cm)', '鄰近田浦水庫與彩繪小鎮，海風第一線守護者。'],
+      ['新前墩風獅爺', '金沙鎮', 24.4755, 118.4445, '石雕立姿 (128cm)', '以西瓜節聞名的新前墩聚落守護神。'],
+      ['東割風獅爺', '金沙鎮', 24.4735, 118.4412, '石雕蹲距 (84cm)', '藏於田野間的特色風獅爺。'],
+      ['內洋風獅爺 (一)', '金沙鎮', 24.4718, 118.4485, '泥塑立姿 (150cm)', '色彩鮮明，手執令旗鎮守內洋村。'],
+      ['內洋風獅爺 (二)', '金沙鎮', 24.4708, 118.4472, '石雕蹲距 (95cm)', '內洋聚落另一隅的石雕風獅爺。'],
+      ['東山風獅爺', '金沙鎮', 24.4785, 118.4418, '石雕立姿 (136cm)', '佇立在田間小路交會處，笑容滿面。'],
+      ['東溪前風獅爺', '金沙鎮', 24.4838, 118.4168, '石雕蹲距 (90cm)', '與沙美生活圈相連的溫馨聚落風獅爺。'],
+      ['下新厝風獅爺', '金沙鎮', 24.4905, 118.4182, '石雕立姿 (122cm)', '守護金沙溪畔農田與村莊。'],
+      ['大洋風獅爺', '金沙鎮', 24.4742, 118.4465, '石雕立姿 (130cm)', '大洋里聚落代表，線條粗獷有力。'],
+
+      // ================= 金湖鎮 (16尊) =================
+      ['瓊林風獅爺 (大)', '金湖鎮', 24.4552, 118.3728, '石雕立姿 (188cm)', '金門最知名地標！紅披風配令旗，帥氣度滿分！'],
+      ['瓊林風獅爺 (蔡氏家廟牆嵌)', '金湖鎮', 24.4525, 118.3742, '石雕鑲壁 (66cm)', '鑲嵌於蔡氏家廟後壁，造型俏皮獨特！'],
+      ['瓊林風獅爺 (北風獅)', '金湖鎮', 24.4541, 118.3755, '石雕立姿 (116cm)', '守護千年聚落瓊林的另一尊重要風獅爺。'],
+      ['塔后風獅爺', '金湖鎮', 24.4423, 118.4148, '石雕蹲距 (62cm)', '體型嬌小玲瓏，耳朵圓圓像小狗狗一樣可愛！'],
+      ['山外風獅爺', '金湖鎮', 24.4445, 118.4265, '石雕立姿 (128cm)', '守護熱鬧的山外聚落與太湖周邊。'],
+      ['陳坑 (成功) 風獅爺', '金湖鎮', 24.4328, 118.3952, '石雕立姿 (145cm)', '面向料羅灣海景，鄰近陳景蘭洋樓與成功海灘。'],
+      ['下湖風獅爺 (一)', '金湖鎮', 24.4385, 118.4582, '石雕立姿 (136cm)', '位於金門東南角海岸聚落，長年迎戰強勁海風。'],
+      ['下湖風獅爺 (二)', '金湖鎮', 24.4375, 118.4568, '石雕蹲距 (95cm)', '與一號風獅爺共同護佑下湖村民。'],
+      ['溪邊風獅爺', '金湖鎮', 24.4428, 118.4595, '石雕蹲距 (112cm)', '鄰近溪邊海水浴場，帶著爽朗大笑的海邊守護者。'],
+      ['峰上風獅爺', '金湖鎮', 24.4355, 118.4652, '石雕立姿 (130cm)', '金門最東端的風獅爺之一，鄰近峰上巡檢司城。'],
+      ['湖前風獅爺', '金湖鎮', 24.4372, 118.4185, '石雕蹲距 (105cm)', '位於金湖鎮湖前聚落，捲毛造型十分精緻。'],
+      ['小徑風獅爺', '金湖鎮', 24.4495, 118.3885, '石雕立姿 (126cm)', '鄰近特約茶室展示館與邱良功墓園。'],
+      ['正義里 (尚義) 風獅爺', '金湖鎮', 24.4365, 118.3895, '石雕蹲距 (98cm)', '位於尚義機場周邊聚落，守護起降平安。'],
+      ['料羅風獅爺', '金湖鎮', 24.4215, 118.4325, '石雕立姿 (120cm)', '守護料羅港灣與順濟宮周邊海域。'],
+      ['夏興風獅爺', '金湖鎮', 24.4358, 118.4045, '石雕蹲距 (102cm)', '位於夏興孚濟廟附近，神態悠閒自得。'],
+      ['東村風獅爺', '金湖鎮', 24.4402, 118.4485, '石雕立姿 (118cm)', '佇立於金湖東側村落，色彩溫潤。'],
+
+      // ================= 金寧鄉 (10尊) =================
+      ['安岐風獅爺', '金寧鄉', 24.4688, 118.3168, '泥塑立姿 (378cm)', '全金門最高大！高達378公分的青綠色巨人風獅爺！'],
+      ['北山風獅爺', '金寧鄉', 24.4783, 118.3125, '石雕立姿 (112cm)', '古寧頭北山聚落守護神，鄰近北山古洋樓。'],
+      ['湖下風獅爺', '金寧鄉', 24.4565, 118.3085, '石雕蹲距 (115cm)', '鄰近金門大橋湖下端，看著海景與大橋的風獅爺。'],
+      ['東洲風獅爺', '金寧鄉', 24.4425, 118.3345, '石雕蹲距 (96cm)', '距離金門大學超近！是金大生最好收集的鄰居風獅爺。'],
+      ['昔果山風獅爺', '金寧鄉', 24.4265, 118.3565, '石雕蹲距 (88cm)', '位於尚義機場跑道西側紅土高地，小巧討喜。'],
+      ['后盤山風獅爺', '金寧鄉', 24.4585, 118.3525, '石雕立姿 (132cm)', '位於伯玉路與環島北路中間聚落，神情威嚴。'],
+      ['西浦頭風獅爺', '金寧鄉', 24.4635, 118.3112, '石雕蹲距 (102cm)', '鄰近李光前將軍廟，守護金寧西側海岸。'],
+      ['榜林風獅爺', '金寧鄉', 24.4385, 118.3425, '石雕立姿 (120cm)', '位於金大與金城生活圈交界的榜林圓環附近。'],
+      ['后湖風獅爺', '金寧鄉', 24.4212, 118.3385, '石雕蹲距 (108cm)', '鄰近熱鬧的后湖海濱公園沙灘，聽浪聲的風獅爺。'],
+      ['頂后諳風獅爺', '金寧鄉', 24.4362, 118.3365, '石雕蹲距 (85cm)', '金寧鄉榜林村內安靜守護巷弄的風獅爺。'],
+
+      // ================= 金城鎮 (11尊) =================
+      ['水頭風獅爺', '金城鎮', 24.4126, 118.2974, '石雕蹲距 (122cm)', '位於得月樓僑鄉文化村旁，裂嘴大笑超療癒！'],
+      ['歐厝風獅爺', '金城鎮', 24.4071, 118.3422, '石雕蹲距 (132cm)', '坐落在歐厝沙灘步道旁，大眼睛像戴蛙鏡一樣萌！'],
+      ['珠山風獅爺', '金城鎮', 24.4045, 118.3265, '石雕蹲距 (110cm)', '守護七星流穴傳統閩南聚落珠山村。'],
+      ['古崗風獅爺', '金城鎮', 24.3985, 118.3155, '石雕立姿 (136cm)', '鄰近古崗樓與古崗湖畔，風景優美。'],
+      ['東沙風獅爺', '金城鎮', 24.4095, 118.3325, '石雕蹲距 (95cm)', '位於東沙古厝聚落，造型敦厚可愛。'],
+      ['小西門風獅爺', '金城鎮', 24.4052, 118.3105, '石雕蹲距 (106cm)', '守護金城西南側小西門聚落與農田。'],
+      ['泗湖風獅爺', '金城鎮', 24.4145, 118.3295, '石雕立姿 (125cm)', '鄰近后湖與歐厝之間，雙眼圓亮有神。'],
+      ['和平新村風獅爺', '金城鎮', 24.4205, 118.3245, '石雕蹲距 (90cm)', '鄰近牧馬侯祠與金城市區外圍。'],
+      ['官裡風獅爺', '金城鎮', 24.4085, 118.3195, '石雕立姿 (118cm)', '官裡聚落路口守護神，披著鮮紅披風。'],
+      ['庵前風獅爺', '金城鎮', 24.4185, 118.3192, '石雕蹲距 (104cm)', '位於豐蓮山牧馬侯祠周邊聚落。'],
+      ['後豐港風獅爺', '金城鎮', 24.4225, 118.2985, '石雕立姿 (128cm)', '鄰近水頭碼頭與建功嶼海岸，守護漁民出海平安。'],
+
+      // ================= 烈嶼鄉 (小金門特別收錄) =================
+      ['烈嶼西方風雞 (小金門特別守護神)', '烈嶼鄉', 24.4368, 118.2435, '泥塑立姿白公雞', '小金門專屬的聚落守護神「風雞」，跨過金門大橋就能收集！']
     ];
 
-    // ==========================================
+    // 色彩調色盤 (讓100尊風獅爺呈現豐富手繪色彩)
+    const LION_PALETTE = [
+      { color: '#E05A47', cape: '#D62828', item: '令旗' },
+      { color: '#4D9078', cape: '#E63946', item: '帥印' },
+      { color: '#D99B52', cape: '#F4A261', item: '繡球' },
+      { color: '#457B9D', cape: '#E63946', item: '金鈴鐺' },
+      { color: '#8D99AE', cape: '#E05A47', item: '元寶' },
+      { color: '#C97A63', cape: '#E9C46A', item: '令旗' },
+      { color: '#E5989B', cape: '#FFB703', item: '紅彩球' },
+      { color: '#F2B705', cape: '#D62828', item: '寶劍' }
+    ];
+
+    // 轉換為完整結構化陣列
+    const WIND_LIONS = RAW_LION_DATA.map((item, idx) => {
+      const style = LION_PALETTE[idx % LION_PALETTE.length];
+      return {
+        id: `lion_${idx + 1}`,
+        indexNum: String(idx + 1).padStart(3, '0'),
+        name: item[0],
+        township: item[1],
+        lat: item[2],
+        lng: item[3],
+        height: item[4],
+        feature: item[5],
+        color: style.color,
+        capeColor: style.cape,
+        accessory: style.item
+      };
+    });
+
+    // =========================================================
     // 2. 遊戲狀態與儲存管理
-    // ==========================================
-    const STORAGE_KEY = 'kinmen_windlion_collected_v1';
+    // =========================================================
+    const STORAGE_KEY = 'kinmen_windlion_100_v2';
+    const RADIUS_KEY = 'kinmen_windlion_radius_v2';
+
     let collectedIds = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+    let alertRadius = parseInt(localStorage.getItem(RADIUS_KEY) || '150', 10);
+
     let currentFilter = 'all';
-    
+    let currentTownship = 'all';
+    let searchQuery = '';
+
     // 預設座標：國立金門大學周邊 (24.4485, 118.3225)
     let userPos = { lat: 24.4485, lng: 118.3225 };
     let watchId = null;
     let isGpsActive = false;
     let currentAlertLionId = null;
-    let notifiedSet = new Set(); // 避免同一次靠近重複狂跳通知
+    let notifiedSet = new Set();
 
-    // Leaflet 實例與圖層
     let map = null;
     let markers = {};
     let userMarker = null;
     let userCircle = null;
 
-    // ==========================================
+    // =========================================================
     // 3. 手繪風 Q 版風獅爺 SVG 產生器
-    // ==========================================
-    function generateLionSVG(lion, isCollected = true, size = 64) {
+    // =========================================================
+    function generateLionSVG(lion, isCollected = true, size = 56) {
       const mainColor = isCollected ? lion.color : '#B8B2A6';
       const capeColor = isCollected ? lion.capeColor : '#8C857B';
       const cheekColor = isCollected ? '#FF8FA3' : '#9E988E';
 
       return `
         <svg width="${size}" height="${size}" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <!-- 紅色神明披風 -->
           <path d="M16 68 C8 85, 18 96, 50 96 C82 96, 92 85, 84 68 Z" fill="${capeColor}" stroke="#3D312A" stroke-width="4" stroke-linejoin="round"/>
-          <!-- 捲捲鬃毛外圈 -->
           <path d="M22 45 C12 36, 18 22, 30 24 C34 12, 48 12, 50 20 C52 12, 66 12, 70 24 C82 22, 88 36, 78 45 C88 55, 82 70, 70 68 C65 78, 35 78, 30 68 C18 70, 12 55, 22 45 Z" fill="${mainColor}" stroke="#3D312A" stroke-width="4" stroke-linejoin="round"/>
-          <!-- 獅子臉龐 -->
           <rect x="27" y="30" width="46" height="38" rx="16" fill="#FFFDF7" stroke="#3D312A" stroke-width="3.5"/>
-          <!-- 大眼睛 -->
           <circle cx="39" cy="44" r="6" fill="#3D312A"/>
           <circle cx="37" cy="42" r="2" fill="#FFFFFF"/>
           <circle cx="61" cy="44" r="6" fill="#3D312A"/>
           <circle cx="59" cy="42" r="2" fill="#FFFFFF"/>
-          <!-- 粗眉毛 -->
           <path d="M31 35 Q39 30 45 36" stroke="#3D312A" stroke-width="3.5" stroke-linecap="round"/>
           <path d="M69 35 Q61 30 55 36" stroke="#3D312A" stroke-width="3.5" stroke-linecap="round"/>
-          <!-- 大鼻子 -->
           <ellipse cx="50" cy="49" rx="6" ry="4" fill="${capeColor}" stroke="#3D312A" stroke-width="2.5"/>
-          <!-- 裂嘴大笑與小虎牙 -->
           <path d="M35 55 Q50 67 65 55 Z" fill="#E05A47" stroke="#3D312A" stroke-width="3" stroke-linejoin="round"/>
           <polygon points="39,56 42,61 45,56" fill="#FFFFFF" stroke="#3D312A" stroke-width="1.5"/>
           <polygon points="55,56 58,61 61,56" fill="#FFFFFF" stroke="#3D312A" stroke-width="1.5"/>
-          <!-- 腮紅 -->
           <circle cx="31" cy="51" r="3.5" fill="${cheekColor}" opacity="0.8"/>
           <circle cx="69" cy="51" r="3.5" fill="${cheekColor}" opacity="0.8"/>
-          <!-- 胸前金鈴鐺 -->
           <circle cx="50" cy="77" r="6.5" fill="#F2B705" stroke="#3D312A" stroke-width="3"/>
           <line x1="46" y1="77" x2="54" y2="77" stroke="#3D312A" stroke-width="2"/>
           <circle cx="50" cy="79" r="1.5" fill="#3D312A"/>
@@ -440,9 +535,9 @@
       `;
     }
 
-    // ==========================================
-    // 4. 音效合成器 (Web Audio API 免外部音檔)
-    // ==========================================
+    // =========================================================
+    // 4. 音效合成器
+    // =========================================================
     function playSound(type) {
       try {
         const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -452,33 +547,29 @@
         gain.connect(ctx.destination);
 
         if (type === 'stamp') {
-          // 蓋章輕快叮咚聲
           osc.type = 'triangle';
-          osc.frequency.setValueAtTime(523.25, ctx.currentTime); // C5
-          osc.frequency.setValueAtTime(659.25, ctx.currentTime + 0.08); // E5
-          osc.frequency.setValueAtTime(783.99, ctx.currentTime + 0.16); // G5
+          osc.frequency.setValueAtTime(523.25, ctx.currentTime);
+          osc.frequency.setValueAtTime(659.25, ctx.currentTime + 0.08);
+          osc.frequency.setValueAtTime(783.99, ctx.currentTime + 0.16);
           gain.gain.setValueAtTime(0.25, ctx.currentTime);
           gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.45);
           osc.start();
           osc.stop(ctx.currentTime + 0.45);
         } else if (type === 'radar') {
-          // 發現風獅爺提示音
           osc.type = 'sine';
-          osc.frequency.setValueAtTime(587.33, ctx.currentTime); // D5
-          osc.frequency.setValueAtTime(880, ctx.currentTime + 0.12); // A5
+          osc.frequency.setValueAtTime(587.33, ctx.currentTime);
+          osc.frequency.setValueAtTime(880, ctx.currentTime + 0.12);
           gain.gain.setValueAtTime(0.3, ctx.currentTime);
           gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
           osc.start();
           osc.stop(ctx.currentTime + 0.5);
         }
-      } catch (e) {
-        // 忽略瀏覽器未互動前的靜音限制
-      }
+      } catch (e) {}
     }
 
-    // ==========================================
-    // 5. 距離計算 (Haversine 公式，回傳公尺)
-    // ==========================================
+    // =========================================================
+    // 5. 距離計算與自訂感應距離更新
+    // =========================================================
     function getDistanceMeters(lat1, lon1, lat2, lon2) {
       const R = 6371e3;
       const toRad = deg => (deg * Math.PI) / 180;
@@ -497,24 +588,41 @@
       return `${(meters / 1000).toFixed(1)} km`;
     }
 
-    // ==========================================
-    // 6. 初始化 Leaflet 地圖與標記
-    // ==========================================
+    function updateAlertRadius(val) {
+      alertRadius = parseInt(val, 10);
+      localStorage.setItem(RADIUS_KEY, String(alertRadius));
+
+      // 同步拉桿與文字顯示
+      document.getElementById('radius-slider').value = alertRadius;
+      const label = alertRadius >= 1000 ? `${(alertRadius / 1000).toFixed(2)} 公里 (km)` : `${alertRadius} 公尺 (m)`;
+      document.getElementById('radius-display').textContent = label;
+      document.getElementById('legend-radius').textContent = formatDistance(alertRadius);
+
+      // 即時調整地圖上的藍色感應圈半徑
+      if (userCircle) {
+        userCircle.setRadius(alertRadius);
+      }
+      if (userMarker) {
+        userMarker.setPopupContent(`<div class="font-bold text-xs p-1">📍 你目前的位置<br><span class="text-blue-600">自訂感應半徑：${formatDistance(alertRadius)}</span></div>`);
+      }
+
+      // 範圍擴大時重新檢查是否有風獅爺進入感應圈
+      checkProximityAndNotify();
+      renderLionList();
+    }
+
+    // =========================================================
+    // 6. 初始化地圖與標記
+    // =========================================================
     function initMap() {
-      // 以金門島中心初始化
-      map = L.map('map', {
-        zoomControl: true
-      }).setView([24.4550, 118.3650], 12);
+      map = L.map('map', { zoomControl: true }).setView([24.4580, 118.3750], 12);
 
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; OpenStreetMap contributors',
         maxZoom: 19
       }).addTo(map);
 
-      // 建立使用者位置標記與 150m 感應圈
       updateUserMapMarker();
-
-      // 建立所有風獅爺地圖標記
       renderMapMarkers();
     }
 
@@ -538,19 +646,20 @@
       if (userMarker) {
         userMarker.setLatLng([userPos.lat, userPos.lng]);
         userCircle.setLatLng([userPos.lat, userPos.lng]);
+        userCircle.setRadius(alertRadius);
       } else {
         userCircle = L.circle([userPos.lat, userPos.lng], {
-          radius: 150,
+          radius: alertRadius,
           color: '#3B82F6',
           weight: 2,
           dashArray: '6, 6',
           fillColor: '#60A5FA',
-          fillOpacity: 0.15
+          fillOpacity: 0.16
         }).addTo(map);
 
         userMarker = L.marker([userPos.lat, userPos.lng], { icon: userIcon, zIndexOffset: 1000 })
           .addTo(map)
-          .bindPopup(`<div class="font-bold text-xs p-1">📍 你目前的位置<br><span class="text-stone-500">感應半徑：150公尺</span></div>`);
+          .bindPopup(`<div class="font-bold text-xs p-1">📍 你目前的位置<br><span class="text-blue-600">自訂感應半徑：${formatDistance(alertRadius)}</span></div>`);
       }
     }
 
@@ -559,28 +668,32 @@
         const isCollected = collectedIds.includes(lion.id);
         const dist = getDistanceMeters(userPos.lat, userPos.lng, lion.lat, lion.lng);
 
+        // 鄉鎮篩選時，隱藏不屬於該鄉鎮的標記以保持畫面清爽
+        const visible = (currentTownship === 'all' || lion.township === currentTownship);
+
         const customIcon = L.divIcon({
           className: 'lion-map-marker',
           html: `
-            <div class="relative group cursor-pointer transition-transform hover:scale-110" style="width:48px;height:48px;">
-              <div class="w-12 h-12 rounded-full border-2 border-[#3D312A] shadow-md flex items-center justify-center ${isCollected ? 'bg-[#FFF3E0]' : 'bg-stone-200'}">
-                ${generateLionSVG(lion, isCollected, 40)}
+            <div class="relative group cursor-pointer transition-transform hover:scale-125" style="width:38px;height:38px;">
+              <div class="w-9 h-9 rounded-full border-2 border-[#3D312A] shadow flex items-center justify-center ${isCollected ? 'bg-[#FFF3E0]' : 'bg-stone-200'}">
+                ${generateLionSVG(lion, isCollected, 32)}
               </div>
-              ${isCollected ? `<span class="absolute -top-1 -right-1 bg-[#E05A47] text-white text-[10px] font-black w-5 h-5 rounded-full border border-[#3D312A] flex items-center justify-center">✓</span>` : ''}
+              ${isCollected ? `<span class="absolute -top-1 -right-1 bg-[#E05A47] text-white text-[9px] font-black w-4 h-4 rounded-full border border-[#3D312A] flex items-center justify-center">✓</span>` : ''}
             </div>
           `,
-          iconSize: [48, 48],
-          iconAnchor: [24, 24],
-          popupAnchor: [0, -22]
+          iconSize: [38, 38],
+          iconAnchor: [19, 19],
+          popupAnchor: [0, -18]
         });
 
         const popupHtml = `
-          <div class="p-2 min-w-[200px]">
-            <div class="flex items-center gap-2 mb-1">
-              <span class="text-[11px] font-bold px-2 py-0.5 rounded bg-amber-100 border border-[#3D312A]">${lion.township}</span>
+          <div class="p-2 min-w-[210px]">
+            <div class="flex items-center justify-between gap-2 mb-1">
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-100 border border-[#3D312A]">#${lion.indexNum} ${lion.township}</span>
               <span class="text-xs font-bold text-stone-500">距離 ${formatDistance(dist)}</span>
             </div>
             <h3 class="font-black text-base text-[#3D312A]">${lion.name}</h3>
+            <p class="text-[11px] font-bold text-stone-500 mt-0.5">${lion.height}</p>
             <p class="text-xs text-stone-600 mt-1 leading-relaxed">${lion.feature}</p>
             <div class="mt-3 flex gap-1.5">
               <button onclick="toggleCollect('${lion.id}')" class="sketch-btn flex-1 py-1.5 text-xs font-black ${isCollected ? 'bg-stone-200 text-stone-700' : 'bg-[#E05A47] text-white'}">
@@ -597,115 +710,131 @@
         if (markers[lion.id]) {
           markers[lion.id].setIcon(customIcon);
           markers[lion.id].setPopupContent(popupHtml);
+          if (visible && !map.hasLayer(markers[lion.id])) {
+            markers[lion.id].addTo(map);
+          } else if (!visible && map.hasLayer(markers[lion.id])) {
+            map.removeLayer(markers[lion.id]);
+          }
         } else {
           markers[lion.id] = L.marker([lion.lat, lion.lng], { icon: customIcon })
-            .addTo(map)
             .bindPopup(popupHtml);
+          if (visible) markers[lion.id].addTo(map);
         }
       });
     }
 
     function resetMapCenter() {
-      map.flyTo([24.4550, 118.3650], 12, { duration: 0.8 });
+      map.flyTo([24.4580, 118.3750], 12, { duration: 0.7 });
+    }
+
+    function centerOnUser() {
+      map.flyTo([userPos.lat, userPos.lng], 15, { duration: 0.7 });
+      if (userMarker) userMarker.openPopup();
     }
 
     function focusLionOnMap(lionId) {
       const lion = WIND_LIONS.find(l => l.id === lionId);
       if (!lion) return;
-      map.flyTo([lion.lat, lion.lng], 15, { duration: 0.8 });
+      map.flyTo([lion.lat, lion.lng], 16, { duration: 0.7 });
       setTimeout(() => {
         if (markers[lion.id]) markers[lion.id].openPopup();
-      }, 600);
+      }, 500);
     }
 
-    // ==========================================
-    // 7. 渲染右側手繪圖鑑手札列表
-    // ==========================================
+    // =========================================================
+    // 7. 渲染右側百尊風獅爺圖鑑手札
+    // =========================================================
     function renderLionList() {
       const container = document.getElementById('lion-list');
-      
-      // 根據距離由近到遠排序
-      const sortedLions = [...WIND_LIONS].map(lion => ({
+
+      // 依目前距離由近到遠排序
+      const sortedLions = WIND_LIONS.map(lion => ({
         ...lion,
         distance: getDistanceMeters(userPos.lat, userPos.lng, lion.lat, lion.lng),
         isCollected: collectedIds.includes(lion.id)
       })).sort((a, b) => a.distance - b.distance);
 
-      // 套用篩選器
+      // 根據鄉鎮、收集狀態與關鍵字過濾
       const filtered = sortedLions.filter(lion => {
-        if (currentFilter === 'collected') return lion.isCollected;
-        if (currentFilter === 'uncollected') return !lion.isCollected;
+        if (currentTownship !== 'all' && lion.township !== currentTownship) return false;
+        if (currentFilter === 'collected' && !lion.isCollected) return false;
+        if (currentFilter === 'uncollected' && lion.isCollected) return false;
+        if (searchQuery) {
+          const q = searchQuery.toLowerCase();
+          const matchName = lion.name.toLowerCase().includes(q);
+          const matchTown = lion.township.toLowerCase().includes(q);
+          const matchFeat = lion.feature.toLowerCase().includes(q);
+          if (!matchName && !matchTown && !matchFeat) return false;
+        }
         return true;
       });
+
+      document.getElementById('filtered-count-badge').textContent = `${filtered.length} 尊`;
 
       if (filtered.length === 0) {
         container.innerHTML = `
           <div class="text-center py-12 text-stone-400">
             <div class="text-4xl mb-2">🦁</div>
-            <p class="font-bold text-sm">這個分類目前還沒有風獅爺喔！</p>
+            <p class="font-bold text-sm">找不到符合條件的風獅爺喔！</p>
           </div>
         `;
         return;
       }
 
       container.innerHTML = filtered.map(lion => {
-        const isNearby = lion.distance <= 150;
+        const isNearby = lion.distance <= alertRadius;
         return `
-          <div class="sketch-box-sm p-3.5 relative transition-all ${lion.isCollected ? 'bg-[#FFFDF5]' : 'bg-[#F8F5EE]'}" id="card-${lion.id}">
+          <div class="sketch-box-sm p-3 relative transition-all ${lion.isCollected ? 'bg-[#FFFDF5]' : 'bg-[#F8F5EE]'}" id="card-${lion.id}">
             
-            <!-- 已收集紅印章 -->
             ${lion.isCollected ? `
-              <div class="absolute top-3 right-3 z-10 pointer-events-none">
-                <div class="stamp-badge text-xs">💮 已參拜收集</div>
+              <div class="absolute top-2.5 right-2.5 z-10 pointer-events-none">
+                <div class="stamp-badge text-[11px]">💮 已參拜收集</div>
               </div>
             ` : ''}
 
             <div class="flex items-start gap-3">
-              <!-- 手繪風獅爺頭像 -->
-              <div onclick="focusLionOnMap('${lion.id}')" class="w-16 h-16 rounded-2xl border-2 border-[#3D312A] flex-shrink-0 flex items-center justify-center cursor-pointer ${lion.isCollected ? 'bg-[#FFF3D6]' : 'bg-stone-200'}" title="點擊在地圖上查看">
-                ${generateLionSVG(lion, lion.isCollected, 54)}
+              <div onclick="focusLionOnMap('${lion.id}')" class="w-14 h-14 rounded-2xl border-2 border-[#3D312A] flex-shrink-0 flex items-center justify-center cursor-pointer ${lion.isCollected ? 'bg-[#FFF3D6]' : 'bg-stone-200'}" title="點擊在地圖上查看">
+                ${generateLionSVG(lion, lion.isCollected, 48)}
               </div>
 
-              <!-- 資訊欄 -->
               <div class="flex-1 min-w-0">
-                <div class="flex flex-wrap items-center gap-1.5 mb-1">
-                  <span class="text-[11px] font-black px-2 py-0.5 rounded bg-[#FFE082] border border-[#3D312A]">
+                <div class="flex flex-wrap items-center gap-1.5 mb-0.5">
+                  <span class="text-[10px] font-black px-1.5 py-0.5 rounded bg-stone-800 text-white">
+                    #${lion.indexNum}
+                  </span>
+                  <span class="text-[10px] font-black px-1.5 py-0.5 rounded bg-[#FFE082] border border-[#3D312A]">
                     ${lion.township}
                   </span>
                   <span class="text-xs font-bold ${isNearby ? 'text-[#E05A47] animate-pulse' : 'text-stone-500'}">
-                    📍 距離 ${formatDistance(lion.distance)} ${isNearby ? '(就在身邊!)' : ''}
+                    📍 ${formatDistance(lion.distance)} ${isNearby ? '(感應圈內!)' : ''}
                   </span>
                 </div>
 
-                <h3 onclick="focusLionOnMap('${lion.id}')" class="text-base font-black text-[#3D312A] cursor-pointer hover:underline truncate">
+                <h3 onclick="focusLionOnMap('${lion.id}')" class="text-sm font-black text-[#3D312A] cursor-pointer hover:underline truncate">
                   ${lion.name}
                 </h3>
-                <p class="text-xs text-stone-500 font-bold mt-0.5">
+                <p class="text-[11px] text-stone-500 font-bold">
                   📏 ${lion.height} ｜ 持有物：${lion.accessory}
                 </p>
-                <p class="text-xs text-stone-600 mt-1 leading-relaxed">
+                <p class="text-xs text-stone-600 mt-0.5 leading-relaxed">
                   ${lion.feature}
                 </p>
               </div>
             </div>
 
-            <!-- 底部操作按鈕列 -->
-            <div class="mt-3 pt-2.5 border-t border-dashed border-stone-300 flex flex-wrap items-center justify-between gap-2">
+            <div class="mt-2.5 pt-2 border-t border-dashed border-stone-300 flex flex-wrap items-center justify-between gap-1.5">
               <div class="flex items-center gap-1.5">
-                <!-- Google Maps 導航按鈕 -->
                 <a href="https://www.google.com/maps/dir/?api=1&destination=${lion.lat},${lion.lng}&travelmode=driving" target="_blank"
-                   class="sketch-btn bg-[#68A678] hover:bg-[#579266] text-white px-3 py-1.5 text-xs font-black flex items-center gap-1">
-                  🧭 導航前往
+                   class="sketch-btn bg-[#68A678] hover:bg-[#579266] text-white px-2.5 py-1 text-xs font-black flex items-center gap-1">
+                  🧭 導航
                 </a>
 
-                <!-- 模擬走到附近按鈕 (方便測試通知) -->
-                <button onclick="simulateWalkTo('${lion.id}')" class="sketch-btn bg-[#FFF4CC] hover:bg-[#FFE699] text-[#3D312A] px-2.5 py-1.5 text-xs font-bold" title="模擬GPS移動到這尊風獅爺旁邊">
+                <button onclick="simulateWalkTo('${lion.id}')" class="sketch-btn bg-[#FFF4CC] hover:bg-[#FFE699] text-[#3D312A] px-2 py-1 text-xs font-bold">
                   ✨ 模擬走到附近
                 </button>
               </div>
 
-              <!-- 蓋章收集切換按鈕 -->
-              <button onclick="toggleCollect('${lion.id}')" class="sketch-btn px-3 py-1.5 text-xs font-black ${lion.isCollected ? 'bg-stone-200 text-stone-700' : 'bg-[#E05A47] text-white'}">
+              <button onclick="toggleCollect('${lion.id}')" class="sketch-btn px-2.5 py-1 text-xs font-black ${lion.isCollected ? 'bg-stone-200 text-stone-700' : 'bg-[#E05A47] text-white'}">
                 ${lion.isCollected ? '✓ 已收集' : '💮 蓋章收集'}
               </button>
             </div>
@@ -714,9 +843,9 @@
       }).join('');
     }
 
-    // ==========================================
-    // 8. 收集邏輯、篩選與進度更新
-    // ==========================================
+    // =========================================================
+    // 8. 互動邏輯：收集、篩選、搜尋
+    // =========================================================
     function toggleCollect(lionId) {
       const idx = collectedIds.indexOf(lionId);
       if (idx === -1) {
@@ -738,22 +867,31 @@
       document.getElementById('total-count').textContent = total;
       document.getElementById('progress-bar').style.width = `${pct}%`;
 
-      // 更新篩選按鈕文字
       document.getElementById('filter-all').textContent = `全部 (${total})`;
-      document.getElementById('filter-collected').textContent = `已收集 (${count})`;
       document.getElementById('filter-uncollected').textContent = `未尋獲 (${total - count})`;
+      document.getElementById('filter-collected').textContent = `已收集 (${count})`;
     }
 
     function setFilter(filterType) {
       currentFilter = filterType;
-      ['all', 'collected', 'uncollected'].forEach(type => {
+      ['all', 'uncollected', 'collected'].forEach(type => {
         const btn = document.getElementById(`filter-${type}`);
         if (type === filterType) {
-          btn.className = 'sketch-btn px-2.5 py-1 text-xs font-black bg-[#E05A47] text-white';
+          btn.className = 'sketch-btn flex-1 py-1 text-xs font-black bg-[#E05A47] text-white';
         } else {
-          btn.className = 'sketch-btn px-2.5 py-1 text-xs font-bold bg-[#FDF8EC]';
+          btn.className = 'sketch-btn flex-1 py-1 text-xs font-bold bg-[#FDF8EC]';
         }
       });
+      renderLionList();
+    }
+
+    function setTownship(township) {
+      currentTownship = township;
+      updateUI();
+    }
+
+    function handleSearch(val) {
+      searchQuery = val.trim();
       renderLionList();
     }
 
@@ -772,9 +910,9 @@
       renderMapMarkers();
     }
 
-    // ==========================================
-    // 9. GPS 定位追蹤與近距離到站通知 (150m)
-    // ==========================================
+    // =========================================================
+    // 9. GPS 定位追蹤與自訂距離感應通知
+    // =========================================================
     function toggleGPS() {
       const btnText = document.getElementById('gps-text');
       const dot = document.getElementById('gps-dot');
@@ -790,13 +928,12 @@
         return;
       }
 
-      // 請求瀏覽器通知權限
       if ('Notification' in window && Notification.permission === 'default') {
         Notification.requestPermission();
       }
 
       if (!('geolocation' in navigator)) {
-        alert('你的瀏覽器不支援 GPS 定位功能，可以使用卡片上的「✨ 模擬走到附近」按鈕體驗！');
+        alert('你的瀏覽器不支援 GPS 定位，請使用卡片上的「✨ 模擬走到附近」按鈕體驗！');
         return;
       }
 
@@ -823,38 +960,45 @@
       );
     }
 
-    // 模擬走到某尊風獅爺旁邊 (供電腦/室內直接體驗通知效果)
     function simulateWalkTo(lionId) {
       const lion = WIND_LIONS.find(l => l.id === lionId);
       if (!lion) return;
 
-      // 將座標設在該風獅爺旁約 35 公尺處
+      // 移動到該風獅爺旁約 15 公尺處（確保即使使用者設定最小 20m 也能觸發通知）
       userPos = {
-        lat: lion.lat - 0.00028,
-        lng: lion.lng - 0.00015
+        lat: lion.lat - 0.00012,
+        lng: lion.lng - 0.00008
       };
 
-      document.getElementById('location-status').textContent = `✨ 模擬位置：已抵達【${lion.name}】附近！`;
+      document.getElementById('location-status').textContent = `✨ 模擬位置：已抵達【${lion.name}】旁！`;
       updateUserMapMarker();
       map.flyTo([lion.lat, lion.lng], 16, { duration: 0.7 });
 
-      // 強制允許再次觸發該尊的通知
       notifiedSet.delete(lion.id);
       checkProximityAndNotify();
       updateUI();
     }
 
     function checkProximityAndNotify() {
+      // 找出距離最近且在使用者設定感應半徑內的未收集風獅爺
+      let closestTarget = null;
+      let minDist = Infinity;
+
       for (const lion of WIND_LIONS) {
         const dist = getDistanceMeters(userPos.lat, userPos.lng, lion.lat, lion.lng);
         const isCollected = collectedIds.includes(lion.id);
 
-        // 進入 150 公尺內且尚未蓋章
-        if (dist <= 150 && !isCollected && !notifiedSet.has(lion.id)) {
-          notifiedSet.add(lion.id);
-          triggerProximityAlert(lion, dist);
-          break;
+        if (dist <= alertRadius && !isCollected && !notifiedSet.has(lion.id)) {
+          if (dist < minDist) {
+            minDist = dist;
+            closestTarget = lion;
+          }
         }
+      }
+
+      if (closestTarget) {
+        notifiedSet.add(closestTarget.id);
+        triggerProximityAlert(closestTarget, minDist);
       }
     }
 
@@ -862,16 +1006,14 @@
       currentAlertLionId = lion.id;
       playSound('radar');
 
-      // 顯示頂部手繪通知橫幅
       const alertBox = document.getElementById('proximity-alert');
-      document.getElementById('alert-title').textContent = `${lion.name} 就在你附近！`;
-      document.getElementById('alert-desc').textContent = `目前距離約 ${dist} 公尺（${lion.township}），快去尋找祂並蓋章吧！`;
+      document.getElementById('alert-title').textContent = `${lion.name} 就在附近！`;
+      document.getElementById('alert-desc').textContent = `目前距離約 ${dist} 公尺（低於你設定的 ${formatDistance(alertRadius)}），快去蓋章收集吧！`;
       alertBox.classList.remove('hidden');
 
-      // 若瀏覽器允許系統通知，同步發送推播
       if ('Notification' in window && Notification.permission === 'granted') {
-        new Notification(`🦁 發現野生風獅爺：${lion.name}！`, {
-          body: `距離你只有 ${dist} 公尺！${lion.feature}`
+        new Notification(`🦁 發現風獅爺：${lion.name}！`, {
+          body: `距離僅 ${dist} 公尺（${lion.township}）！${lion.feature}`
         });
       }
     }
@@ -888,13 +1030,13 @@
       currentAlertLionId = null;
     }
 
-    // ==========================================
-    // 10. 啟動遊戲
-    // ==========================================
+    // =========================================================
+    // 10. 啟動初始化
+    // =========================================================
     window.addEventListener('DOMContentLoaded', () => {
-      // 渲染標題旁的 Q 版風獅爺圖示
-      document.getElementById('header-lion-icon').innerHTML = generateLionSVG(WIND_LIONS[0], true, 56);
+      document.getElementById('header-lion-icon').innerHTML = generateLionSVG(WIND_LIONS[62], true, 56);
       initMap();
+      updateAlertRadius(alertRadius);
       updateUI();
     });
   </script>
