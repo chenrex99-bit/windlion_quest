@@ -190,7 +190,6 @@
         <button onclick="closeBadgeModal()" class="sketch-btn bg-stone-100 px-3 py-1 text-sm font-black">✕ 關閉</button>
       </div>
 
-      <!-- 目前稱號橫幅 -->
       <div class="mt-3 sketch-box-sm bg-[#FFF4CC] p-3 flex flex-wrap items-center justify-between gap-2">
         <div>
           <div class="text-xs font-bold text-stone-600">🎖️ 目前獲得最高稱號：</div>
@@ -202,10 +201,7 @@
         </div>
       </div>
 
-      <!-- 10大徽章網格 -->
-      <div id="badge-grid" class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3 overflow-y-auto pr-1 flex-1">
-        <!-- 由 JS 渲染 -->
-      </div>
+      <div id="badge-grid" class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3 overflow-y-auto pr-1 flex-1"></div>
     </div>
   </div>
 
@@ -234,7 +230,6 @@
       <div class="washi-tape"></div>
       
       <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-        <!-- 左側：標題、目前稱號與圖示 -->
         <div class="flex items-center gap-3">
           <div id="header-lion-icon" class="w-14 h-14 flex-shrink-0"></div>
           <div>
@@ -242,7 +237,6 @@
               <span class="bg-[#E05A47] text-white text-[11px] font-bold px-2 py-0.5 rounded-full border border-[#3D312A]">
                 全金門 100 尊完整版
               </span>
-              <!-- 動態榮譽稱號標籤 -->
               <span id="user-title-badge" onclick="openBadgeModal()" class="cursor-pointer bg-[#FFF4CC] hover:bg-[#FFE082] text-[#3D312A] text-xs font-black px-2.5 py-0.5 rounded-full border-2 border-[#3D312A] shadow-sm">
                 🌱 初來乍到尋獅客
               </span>
@@ -253,7 +247,6 @@
           </div>
         </div>
 
-        <!-- 中間：自訂感應距離滑桿 -->
         <div class="sketch-box-sm bg-[#FDF8EC] px-3.5 py-2 flex flex-col justify-center min-w-[250px]">
           <div class="flex items-center justify-between text-xs font-bold mb-1">
             <span class="text-stone-600">📡 雷達通知感應距離：</span>
@@ -275,7 +268,6 @@
           </div>
         </div>
 
-        <!-- 右側：收集進度、成就徽章館與 GPS 開關 -->
         <div class="flex flex-wrap items-center gap-2">
           <div class="sketch-box-sm bg-[#FDF8EC] px-3 py-1.5 flex items-center gap-2.5 flex-1 sm:flex-initial">
             <div>
@@ -289,12 +281,10 @@
             </div>
           </div>
 
-          <!-- 成就徽章按鈕 -->
           <button onclick="openBadgeModal()" class="sketch-btn bg-[#FFF4CC] hover:bg-[#FFE082] px-3 py-2.5 text-xs font-black flex items-center gap-1">
             🏆 成就徽章 (<span id="header-badge-count">0</span>/10)
           </button>
 
-          <!-- GPS 雷達按鈕 -->
           <button id="gps-btn" onclick="toggleGPS()" class="sketch-btn bg-[#FFE082] hover:bg-[#FFD54F] px-3 py-2.5 text-xs font-black flex items-center gap-1.5">
             <span id="gps-dot" class="w-2.5 h-2.5 rounded-full bg-stone-500 border border-[#3D312A]"></span>
             <span id="gps-text">開啟 GPS</span>
@@ -308,10 +298,8 @@
     </div>
   </header>
 
-  <!-- 主內容區：左側地圖 + 右側百尊風獅爺手札 -->
   <main class="max-w-7xl w-full mx-auto px-4 mt-2 flex-1 grid grid-cols-1 lg:grid-cols-12 gap-5">
     
-    <!-- 左欄：手繪尋寶地圖 (佔 7 欄) -->
     <section class="lg:col-span-7 flex flex-col">
       <div class="sketch-box p-3 bg-[#FFFDF9] flex-1 flex flex-col relative min-h-[400px] lg:min-h-[640px]">
         <div class="flex flex-wrap items-center justify-between gap-2 mb-2 px-1">
@@ -354,7 +342,6 @@
       </div>
     </section>
 
-    <!-- 右欄：百尊風獅爺圖鑑手札 (佔 5 欄) -->
     <section class="lg:col-span-5 flex flex-col">
       <div class="sketch-box p-4 bg-[#FFFDF9] flex-1 flex flex-col max-h-[680px]">
         
@@ -399,11 +386,7 @@
   </main>
 
   <script>
-    // =========================================================
-    // 1. 全金門 100 尊聚落風獅爺完整座標資料庫
-    // =========================================================
     const RAW_LION_DATA = [
-      // 金沙鎮 (62尊)
       ['官澳風獅爺 (公)', '金沙鎮', 24.5136, 118.4148, '石雕立姿 (142cm)', '位於官澳海堤馬路旁，凝視遠方守護海岸線。'],
       ['官澳風獅爺 (母)', '金沙鎮', 24.5122, 118.4159, '石雕立姿 (148cm)', '與官澳公風獅爺遙遙相望，共同鎮守聚落北風。'],
       ['青嶼風獅爺 (大)', '金沙鎮', 24.5082, 118.4295, '石雕立姿 (176cm)', '位於青嶼聚落外圍，體態威武挺拔。'],
@@ -462,7 +445,7 @@
       ['東割風獅爺', '金沙鎮', 24.4735, 118.4412, '石雕蹲距 (84cm)', '藏於田野間的特色風獅爺。'],
       ['內洋風獅爺 (一)', '金沙鎮', 24.4718, 118.4485, '泥塑立姿 (150cm)', '色彩鮮明，手執令旗鎮守內洋村。'],
       ['內洋風獅爺 (二)', '金沙鎮', 24.4708, 118.4472, '石雕蹲距 (95cm)', '內洋聚落另一隅的石雕風獅爺。'],
-      ['東山風獅爺', '金沙鎮', 24.4785, 118.4418, '石雕立姿 (136cm)', '佇立在田間小路交會處，笑容滿面。'],
+      ['東山風獅爺', '金沙鎮', 24.4785, 118.4418, '石雕立姿 (136cm)', '佇立於金間小路交會處，笑容滿面。'],
       ['東溪前風獅爺', '金沙鎮', 24.4838, 118.4168, '石雕蹲距 (90cm)', '與沙美生活圈相連的溫馨聚落風獅爺。'],
       ['下新厝風獅爺', '金沙鎮', 24.4905, 118.4182, '石雕立姿 (122cm)', '守護金沙溪畔農田與村莊。'],
       ['大洋風獅爺', '金沙鎮', 24.4742, 118.4465, '石雕立姿 (130cm)', '大洋里聚落代表，線條粗獷有力。'],
@@ -542,80 +525,17 @@
       };
     });
 
-    // =========================================================
-    // 2. 稱號與 10 大成就徽章定義
-    // =========================================================
     const BADGES_CONFIG = [
-      {
-        id: 'first_lion',
-        icon: '🌱',
-        title: '初遇風獅爺',
-        desc: '成功蓋章收集第 1 尊風獅爺',
-        check: (cIds, photos) => cIds.length >= 1
-      },
-      {
-        id: 'ten_lions',
-        icon: '🧭',
-        title: '聚落尋寶新手',
-        desc: '累計收集達 10 尊風獅爺',
-        check: (cIds, photos) => cIds.length >= 10
-      },
-      {
-        id: 'fifty_lions',
-        icon: '🏡',
-        title: '風獅爺榮譽村民',
-        desc: '累計收集達 50 尊風獅爺，半百制霸！',
-        check: (cIds, photos) => cIds.length >= 50
-      },
-      {
-        id: 'hundred_lions',
-        icon: '👑',
-        title: '百獅傳奇宗師',
-        desc: '收齊全金門 100 尊聚落風獅爺！',
-        check: (cIds, photos) => cIds.length >= 100
-      },
-      {
-        id: 'jinning_master',
-        icon: '🎓',
-        title: '金寧尋獅達人',
-        desc: '收齊金寧鄉全部 10 尊風獅爺',
-        check: (cIds, photos) => countByTownship(cIds, '金寧鄉') >= 10
-      },
-      {
-        id: 'jincheng_master',
-        icon: '🏯',
-        title: '金城古鎮行者',
-        desc: '收齊金城鎮全部 11 尊風獅爺',
-        check: (cIds, photos) => countByTownship(cIds, '金城鎮') >= 11
-      },
-      {
-        id: 'jinhu_master',
-        icon: '🎖️',
-        title: '金湖戰地行家',
-        desc: '收齊金湖鎮全部 16 尊風獅爺',
-        check: (cIds, photos) => countByTownship(cIds, '金湖鎮') >= 16
-      },
-      {
-        id: 'jinsha_master',
-        icon: '🦁',
-        title: '金沙風獅王者',
-        desc: '收齊金沙鎮全部 62 尊風獅爺',
-        check: (cIds, photos) => countByTownship(cIds, '金沙鎮') >= 62
-      },
-      {
-        id: 'lieyu_master',
-        icon: '🐓',
-        title: '跨海風雞奇遇',
-        desc: '跨過金門大橋收集烈嶼西方風雞',
-        check: (cIds, photos) => countByTownship(cIds, '烈嶼鄉') >= 1
-      },
-      {
-        id: 'photo_lover',
-        icon: '📸',
-        title: '風獅爺攝影師',
-        desc: '在手札中上傳至少 3 張風獅爺實地合照',
-        check: (cIds, photos) => Object.keys(photos).length >= 3
-      }
+      { id: 'first_lion', icon: '🌱', title: '初遇風獅爺', desc: '成功蓋章收集第 1 尊風獅爺', check: (cIds) => cIds.length >= 1 },
+      { id: 'ten_lions', icon: '🧭', title: '聚落尋寶新手', desc: '累計收集達 10 尊風獅爺', check: (cIds) => cIds.length >= 10 },
+      { id: 'fifty_lions', icon: '🏡', title: '風獅爺榮譽村民', desc: '累計收集達 50 尊風獅爺，半百制霸！', check: (cIds) => cIds.length >= 50 },
+      { id: 'hundred_lions', icon: '👑', title: '百獅傳奇宗師', desc: '收齊全金門 100 尊聚落風獅爺！', check: (cIds) => cIds.length >= 100 },
+      { id: 'jinning_master', icon: '🎓', title: '金寧尋獅達人', desc: '收齊金寧鄉全部 10 尊風獅爺', check: (cIds) => countByTownship(cIds, '金寧鄉') >= 10 },
+      { id: 'jincheng_master', icon: '🏯', title: '金城古鎮行者', desc: '收齊金城鎮全部 11 尊風獅爺', check: (cIds) => countByTownship(cIds, '金城鎮') >= 11 },
+      { id: 'jinhu_master', icon: '🎖️', title: '金湖戰地行家', desc: '收齊金湖鎮全部 16 尊風獅爺', check: (cIds) => countByTownship(cIds, '金湖鎮') >= 16 },
+      { id: 'jinsha_master', icon: '🦁', title: '金沙風獅王者', desc: '收齊金沙鎮全部 62 尊風獅爺', check: (cIds) => countByTownship(cIds, '金沙鎮') >= 62 },
+      { id: 'lieyu_master', icon: '🐓', title: '跨海風雞奇遇', desc: '跨過金門大橋收集烈嶼西方風雞', check: (cIds) => countByTownship(cIds, '烈嶼鄉') >= 1 },
+      { id: 'photo_lover', icon: '📸', title: '風獅爺攝影師', desc: '在手札中上傳至少 3 張風獅爺實地合照', check: (cIds, photos) => Object.keys(photos).length >= 3 }
     ];
 
     function countByTownship(cIds, township) {
@@ -636,9 +556,6 @@
       return '🌱 初來乍到尋獅客';
     }
 
-    // =========================================================
-    // 3. 狀態管理與 IndexedDB 相片資料庫
-    // =========================================================
     const STORAGE_KEY = 'kinmen_windlion_100_v2';
     const RADIUS_KEY = 'kinmen_windlion_radius_v2';
     const UNLOCKED_BADGES_KEY = 'kinmen_windlion_badges_v3';
@@ -647,7 +564,7 @@
     let alertRadius = parseInt(localStorage.getItem(RADIUS_KEY) || '150', 10);
     let unlockedBadges = new Set(JSON.parse(localStorage.getItem(UNLOCKED_BADGES_KEY) || '[]'));
 
-    let photoCache = {}; // { lionId: { dataUrl, dateStr } }
+    let photoCache = {};
     let activeCameraLionId = null;
 
     let currentFilter = 'all';
@@ -665,7 +582,6 @@
     let userMarker = null;
     let userCircle = null;
 
-    // IndexedDB 初始化與讀寫 (支援儲存百張壓縮合照)
     let db = null;
     function initPhotoDB() {
       return new Promise((resolve) => {
@@ -721,9 +637,6 @@
       tx.objectStore('photos').clear();
     }
 
-    // =========================================================
-    // 4. 相機拍照與 Canvas 自動縮圖壓縮
-    // =========================================================
     function triggerPhotoUpload(lionId) {
       activeCameraLionId = lionId;
       const input = document.getElementById('camera-input');
@@ -740,7 +653,6 @@
       reader.onload = (e) => {
         const img = new Image();
         img.onload = () => {
-          // 使用 Canvas 壓縮圖片至最大邊長 720px，品質 0.78
           const maxDim = 720;
           let w = img.width;
           let h = img.height;
@@ -764,7 +676,6 @@
 
           savePhotoToDB(targetLionId, compressedDataUrl, dateStr);
 
-          // 拍照打卡同時自動蓋章收集！
           if (!collectedIds.includes(targetLionId)) {
             collectedIds.push(targetLionId);
             localStorage.setItem(STORAGE_KEY, JSON.stringify(collectedIds));
@@ -793,7 +704,7 @@
         triggerPhotoUpload(lionId);
       };
       document.getElementById('photo-delete-btn').onclick = () => {
-        if (confirm('確定要刪除這張合照嗎？（蓋章紀錄會保留）')) {
+        if (confirm('確定要刪除這張合照嗎？')) {
           deletePhotoFromDB(lionId);
           closePhotoModal();
           updateUI();
@@ -811,9 +722,6 @@
       modal.classList.remove('flex');
     }
 
-    // =========================================================
-    // 5. 成就徽章檢查與展示櫃
-    // =========================================================
     function checkAchievements(showToast = true) {
       let newlyUnlocked = null;
 
@@ -827,10 +735,7 @@
 
       localStorage.setItem(UNLOCKED_BADGES_KEY, JSON.stringify([...unlockedBadges]));
 
-      // 更新頂部稱號與徽章數
-      const currentTitle = getUserTitle(collectedIds, photoCache);
-      document.getElementById('user-title-badge').textContent = currentTitle;
-
+      document.getElementById('user-title-badge').textContent = getUserTitle(collectedIds, photoCache);
       const unlockedCount = BADGES_CONFIG.filter(b => b.check(collectedIds, photoCache)).length;
       document.getElementById('header-badge-count').textContent = unlockedCount;
 
@@ -846,8 +751,8 @@
     }
 
     function openBadgeModal() {
-      const unlockedList = BADGES_CONFIG.filter(b => b.check(collectedIds, photoCache));
       document.getElementById('modal-current-title').textContent = getUserTitle(collectedIds, photoCache);
+      const unlockedList = BADGES_CONFIG.filter(b => b.check(collectedIds, photoCache));
       document.getElementById('modal-badge-count').textContent = unlockedList.length;
 
       const grid = document.getElementById('badge-grid');
@@ -882,9 +787,6 @@
       modal.classList.remove('flex');
     }
 
-    // =========================================================
-    // 6. 手繪風 Q 版風獅爺 SVG 產生器與音效
-    // =========================================================
     function generateLionSVG(lion, isCollected = true, size = 56) {
       const mainColor = isCollected ? lion.color : '#B8B2A6';
       const capeColor = isCollected ? lion.capeColor : '#8C857B';
@@ -953,18 +855,12 @@
       } catch (e) {}
     }
 
-    // =========================================================
-    // 7. 距離計算與地圖控制
-    // =========================================================
     function getDistanceMeters(lat1, lon1, lat2, lon2) {
       const R = 6371e3;
       const toRad = deg => (deg * Math.PI) / 180;
       const dLat = toRad(lat2 - lat1);
       const dLon = toRad(lon2 - lon1);
-      const a =
-        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-        Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
-        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+      const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
       const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
       return Math.round(R * c);
     }
@@ -994,31 +890,17 @@
 
     function initMap() {
       map = L.map('map', { zoomControl: true }).setView([24.4580, 118.3750], 12);
-
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; OpenStreetMap contributors',
-        maxZoom: 19
-      }).addTo(map);
-
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
       updateUserMapMarker();
       renderMapMarkers();
     }
 
     function updateUserMapMarker() {
       if (!map) return;
-
       const userIcon = L.divIcon({
         className: 'custom-user-icon',
-        html: `
-          <div class="relative flex items-center justify-center w-9 h-9">
-            <div class="absolute w-9 h-9 bg-blue-400 rounded-full animate-ping opacity-40"></div>
-            <div class="w-7 h-7 rounded-full bg-[#3B82F6] border-2 border-[#3D312A] shadow flex items-center justify-center text-white text-xs font-black">
-              我
-            </div>
-          </div>
-        `,
-        iconSize: [36, 36],
-        iconAnchor: [18, 18]
+        html: `<div class="relative flex items-center justify-center w-9 h-9"><div class="absolute w-9 h-9 bg-blue-400 rounded-full animate-ping opacity-40"></div><div class="w-7 h-7 rounded-full bg-[#3B82F6] border-2 border-[#3D312A] shadow flex items-center justify-center text-white text-xs font-black">我</div></div>`,
+        iconSize: [36, 36], iconAnchor: [18, 18]
       });
 
       if (userMarker) {
@@ -1026,18 +908,8 @@
         userCircle.setLatLng([userPos.lat, userPos.lng]);
         userCircle.setRadius(alertRadius);
       } else {
-        userCircle = L.circle([userPos.lat, userPos.lng], {
-          radius: alertRadius,
-          color: '#3B82F6',
-          weight: 2,
-          dashArray: '6, 6',
-          fillColor: '#60A5FA',
-          fillOpacity: 0.16
-        }).addTo(map);
-
-        userMarker = L.marker([userPos.lat, userPos.lng], { icon: userIcon, zIndexOffset: 1000 })
-          .addTo(map)
-          .bindPopup(`<div class="font-bold text-xs p-1">📍 你目前的位置<br><span class="text-blue-600">自訂感應半徑：${formatDistance(alertRadius)}</span></div>`);
+        userCircle = L.circle([userPos.lat, userPos.lng], { radius: alertRadius, color: '#3B82F6', weight: 2, dashArray: '6, 6', fillColor: '#60A5FA', fillOpacity: 0.16 }).addTo(map);
+        userMarker = L.marker([userPos.lat, userPos.lng], { icon: userIcon, zIndexOffset: 1000 }).addTo(map).bindPopup(`<div class="font-bold text-xs p-1">📍 你目前的位置</div>`);
       }
     }
 
@@ -1050,17 +922,8 @@
 
         const customIcon = L.divIcon({
           className: 'lion-map-marker',
-          html: `
-            <div class="relative group cursor-pointer transition-transform hover:scale-125" style="width:38px;height:38px;">
-              <div class="w-9 h-9 rounded-full border-2 border-[#3D312A] shadow flex items-center justify-center ${isCollected ? 'bg-[#FFF3E0]' : 'bg-stone-200'}">
-                ${generateLionSVG(lion, isCollected, 32)}
-              </div>
-              ${isCollected ? `<span class="absolute -top-1 -right-1 bg-[#E05A47] text-white text-[9px] font-black w-4 h-4 rounded-full border border-[#3D312A] flex items-center justify-center">${hasPhoto ? '📸' : '✓'}</span>` : ''}
-            </div>
-          `,
-          iconSize: [38, 38],
-          iconAnchor: [19, 19],
-          popupAnchor: [0, -18]
+          html: `<div class="relative group cursor-pointer transition-transform hover:scale-125" style="width:38px;height:38px;"><div class="w-9 h-9 rounded-full border-2 border-[#3D312A] shadow flex items-center justify-center ${isCollected ? 'bg-[#FFF3E0]' : 'bg-stone-200'}">${generateLionSVG(lion, isCollected, 32)}</div>${isCollected ? `<span class="absolute -top-1 -right-1 bg-[#E05A47] text-white text-[9px] font-black w-4 h-4 rounded-full border border-[#3D312A] flex items-center justify-center">${hasPhoto ? '📸' : '✓'}</span>` : ''}</div>`,
+          iconSize: [38, 38], iconAnchor: [19, 19], popupAnchor: [0, -18]
         });
 
         const popupHtml = `
@@ -1073,16 +936,9 @@
             <p class="text-[11px] font-bold text-stone-500 mt-0.5">${lion.height}</p>
             <p class="text-xs text-stone-600 mt-1 leading-relaxed">${lion.feature}</p>
             <div class="mt-3 flex flex-wrap gap-1.5">
-              <button onclick="toggleCollect('${lion.id}')" class="sketch-btn flex-1 py-1.5 text-xs font-black ${isCollected ? 'bg-stone-200 text-stone-700' : 'bg-[#E05A47] text-white'}">
-                ${isCollected ? '✓ 已蓋章' : '💮 蓋章'}
-              </button>
-              <button onclick="triggerPhotoUpload('${lion.id}')" class="sketch-btn bg-[#FFE082] text-[#3D312A] px-2.5 py-1.5 text-xs font-black">
-                📸 拍照
-              </button>
-              <a href="https://www.google.com/maps/dir/?api=1&destination=${lion.lat},${lion.lng}&travelmode=driving" target="_blank"
-                 class="sketch-btn bg-[#68A678] text-white px-2.5 py-1.5 text-xs font-black flex items-center justify-center">
-                🧭 導航
-              </a>
+              <button onclick="toggleCollect('${lion.id}')" class="sketch-btn flex-1 py-1.5 text-xs font-black ${isCollected ? 'bg-stone-200 text-stone-700' : 'bg-[#E05A47] text-white'}">${isCollected ? '✓ 已蓋章' : '💮 蓋章'}</button>
+              <button onclick="triggerPhotoUpload('${lion.id}')" class="sketch-btn bg-[#FFE082] text-[#3D312A] px-2.5 py-1.5 text-xs font-black">📸 拍照</button>
+              <a href="https://www.google.com/maps/dir/?api=1&destination=${lion.lat},${lion.lng}&travelmode=driving" target="_blank" class="sketch-btn bg-[#68A678] text-white px-2.5 py-1.5 text-xs font-black flex items-center justify-center">🧭 導航</a>
             </div>
           </div>
         `;
@@ -1090,43 +946,26 @@
         if (markers[lion.id]) {
           markers[lion.id].setIcon(customIcon);
           markers[lion.id].setPopupContent(popupHtml);
-          if (visible && !map.hasLayer(markers[lion.id])) {
-            markers[lion.id].addTo(map);
-          } else if (!visible && map.hasLayer(markers[lion.id])) {
-            map.removeLayer(markers[lion.id]);
-          }
+          if (visible && !map.hasLayer(markers[lion.id])) markers[lion.id].addTo(map);
+          else if (!visible && map.hasLayer(markers[lion.id])) map.removeLayer(markers[lion.id]);
         } else {
-          markers[lion.id] = L.marker([lion.lat, lion.lng], { icon: customIcon })
-            .bindPopup(popupHtml);
+          markers[lion.id] = L.marker([lion.lat, lion.lng], { icon: customIcon }).bindPopup(popupHtml);
           if (visible) markers[lion.id].addTo(map);
         }
       });
     }
 
-    function resetMapCenter() {
-      map.flyTo([24.4580, 118.3750], 12, { duration: 0.7 });
-    }
-
-    function centerOnUser() {
-      map.flyTo([userPos.lat, userPos.lng], 15, { duration: 0.7 });
-      if (userMarker) userMarker.openPopup();
-    }
-
+    function resetMapCenter() { map.flyTo([24.4580, 118.3750], 12, { duration: 0.7 }); }
+    function centerOnUser() { map.flyTo([userPos.lat, userPos.lng], 15, { duration: 0.7 }); if (userMarker) userMarker.openPopup(); }
     function focusLionOnMap(lionId) {
       const lion = WIND_LIONS.find(l => l.id === lionId);
       if (!lion) return;
       map.flyTo([lion.lat, lion.lng], 16, { duration: 0.7 });
-      setTimeout(() => {
-        if (markers[lion.id]) markers[lion.id].openPopup();
-      }, 500);
+      setTimeout(() => { if (markers[lion.id]) markers[lion.id].openPopup(); }, 500);
     }
 
-    // =========================================================
-    // 8. 渲染右側百尊風獅爺手札（含手繪拍立得縮圖）
-    // =========================================================
     function renderLionList() {
       const container = document.getElementById('lion-list');
-
       const sortedLions = WIND_LIONS.map(lion => ({
         ...lion,
         distance: getDistanceMeters(userPos.lat, userPos.lng, lion.lat, lion.lng),
@@ -1140,10 +979,7 @@
         if (currentFilter === 'uncollected' && lion.isCollected) return false;
         if (searchQuery) {
           const q = searchQuery.toLowerCase();
-          const matchName = lion.name.toLowerCase().includes(q);
-          const matchTown = lion.township.toLowerCase().includes(q);
-          const matchFeat = lion.feature.toLowerCase().includes(q);
-          if (!matchName && !matchTown && !matchFeat) return false;
+          if (!lion.name.toLowerCase().includes(q) && !lion.township.toLowerCase().includes(q) && !lion.feature.toLowerCase().includes(q)) return false;
         }
         return true;
       });
@@ -1151,12 +987,7 @@
       document.getElementById('filtered-count-badge').textContent = `${filtered.length} 尊`;
 
       if (filtered.length === 0) {
-        container.innerHTML = `
-          <div class="text-center py-12 text-stone-400">
-            <div class="text-4xl mb-2">🦁</div>
-            <p class="font-bold text-sm">找不到符合條件的風獅爺喔！</p>
-          </div>
-        `;
+        container.innerHTML = `<div class="text-center py-12 text-stone-400"><div class="text-4xl mb-2">🦁</div><p class="font-bold text-sm">找不到符合條件的風獅爺喔！</p></div>`;
         return;
       }
 
@@ -1164,45 +995,25 @@
         const isNearby = lion.distance <= alertRadius;
         return `
           <div class="sketch-box-sm p-3 relative transition-all ${lion.isCollected ? 'bg-[#FFFDF5]' : 'bg-[#F8F5EE]'}" id="card-${lion.id}">
-            
-            ${lion.isCollected ? `
-              <div class="absolute top-2.5 right-2.5 z-10 pointer-events-none">
-                <div class="stamp-badge text-[11px]">💮 已參拜收集</div>
-              </div>
-            ` : ''}
+            ${lion.isCollected ? `<div class="absolute top-2.5 right-2.5 z-10 pointer-events-none"><div class="stamp-badge text-[11px]">💮 已參拜收集</div></div>` : ''}
 
             <div class="flex items-start gap-3">
-              <!-- 風獅爺 Q 版圖示 -->
-              <div onclick="focusLionOnMap('${lion.id}')" class="w-14 h-14 rounded-2xl border-2 border-[#3D312A] flex-shrink-0 flex items-center justify-center cursor-pointer ${lion.isCollected ? 'bg-[#FFF3D6]' : 'bg-stone-200'}" title="點擊在地圖上查看">
+              <div onclick="focusLionOnMap('${lion.id}')" class="w-14 h-14 rounded-2xl border-2 border-[#3D312A] flex-shrink-0 flex items-center justify-center cursor-pointer ${lion.isCollected ? 'bg-[#FFF3D6]' : 'bg-stone-200'}">
                 ${generateLionSVG(lion, lion.isCollected, 48)}
               </div>
 
-              <!-- 文字介紹 -->
               <div class="flex-1 min-w-0">
                 <div class="flex flex-wrap items-center gap-1.5 mb-0.5">
-                  <span class="text-[10px] font-black px-1.5 py-0.5 rounded bg-stone-800 text-white">
-                    #${lion.indexNum}
-                  </span>
-                  <span class="text-[10px] font-black px-1.5 py-0.5 rounded bg-[#FFE082] border border-[#3D312A]">
-                    ${lion.township}
-                  </span>
-                  <span class="text-xs font-bold ${isNearby ? 'text-[#E05A47] animate-pulse' : 'text-stone-500'}">
-                    📍 ${formatDistance(lion.distance)} ${isNearby ? '(感應圈內!)' : ''}
-                  </span>
+                  <span class="text-[10px] font-black px-1.5 py-0.5 rounded bg-stone-800 text-white">#${lion.indexNum}</span>
+                  <span class="text-[10px] font-black px-1.5 py-0.5 rounded bg-[#FFE082] border border-[#3D312A]">${lion.township}</span>
+                  <span class="text-xs font-bold ${isNearby ? 'text-[#E05A47] animate-pulse' : 'text-stone-500'}">📍 ${formatDistance(lion.distance)} ${isNearby ? '(感應圈內!)' : ''}</span>
                 </div>
 
-                <h3 onclick="focusLionOnMap('${lion.id}')" class="text-sm font-black text-[#3D312A] cursor-pointer hover:underline truncate">
-                  ${lion.name}
-                </h3>
-                <p class="text-[11px] text-stone-500 font-bold">
-                  📏 ${lion.height} ｜ 持有物：${lion.accessory}
-                </p>
-                <p class="text-xs text-stone-600 mt-0.5 leading-relaxed">
-                  ${lion.feature}
-                </p>
+                <h3 onclick="focusLionOnMap('${lion.id}')" class="text-sm font-black text-[#3D312A] cursor-pointer hover:underline truncate">${lion.name}</h3>
+                <p class="text-[11px] text-stone-500 font-bold">📏 ${lion.height} ｜ 持有物：${lion.accessory}</p>
+                <p class="text-xs text-stone-600 mt-0.5 leading-relaxed">${lion.feature}</p>
               </div>
 
-              <!-- 若已上傳合照，顯示手繪拍立得縮圖 -->
               ${lion.photo ? `
                 <div onclick="openPhotoModal('${lion.id}')" class="polaroid-frame w-16 flex-shrink-0 cursor-pointer mt-4" title="點擊放大檢視合照">
                   <img src="${lion.photo.dataUrl}" alt="打卡照" class="w-full h-12 object-cover border border-stone-300">
@@ -1211,43 +1022,23 @@
               ` : ''}
             </div>
 
-            <!-- 底部操作按鈕列 -->
             <div class="mt-2.5 pt-2 border-t border-dashed border-stone-300 flex flex-wrap items-center justify-between gap-1.5">
               <div class="flex flex-wrap items-center gap-1.5">
-                <a href="https://www.google.com/maps/dir/?api=1&destination=${lion.lat},${lion.lng}&travelmode=driving" target="_blank"
-                   class="sketch-btn bg-[#68A678] hover:bg-[#579266] text-white px-2.5 py-1 text-xs font-black flex items-center gap-1">
-                  🧭 導航
-                </a>
-
-                <button onclick="triggerPhotoUpload('${lion.id}')" class="sketch-btn bg-[#FFE082] hover:bg-[#FFD54F] text-[#3D312A] px-2.5 py-1 text-xs font-black flex items-center gap-1">
-                  📸 ${lion.photo ? '換照片' : '拍照打卡'}
-                </button>
-
-                <button onclick="simulateWalkTo('${lion.id}')" class="sketch-btn bg-[#FFF4CC] hover:bg-[#FFE699] text-[#3D312A] px-2 py-1 text-[11px] font-bold">
-                  ✨ 模擬到站
-                </button>
+                <a href="https://www.google.com/maps/dir/?api=1&destination=${lion.lat},${lion.lng}&travelmode=driving" target="_blank" class="sketch-btn bg-[#68A678] hover:bg-[#579266] text-white px-2.5 py-1 text-xs font-black flex items-center gap-1">🧭 導航</a>
+                <button onclick="triggerPhotoUpload('${lion.id}')" class="sketch-btn bg-[#FFE082] hover:bg-[#FFD54F] text-[#3D312A] px-2.5 py-1 text-xs font-black flex items-center gap-1">📸 ${lion.photo ? '換照片' : '拍照打卡'}</button>
+                <button onclick="simulateWalkTo('${lion.id}')" class="sketch-btn bg-[#FFF4CC] hover:bg-[#FFE699] text-[#3D312A] px-2 py-1 text-[11px] font-bold">✨ 模擬到站</button>
               </div>
-
-              <button onclick="toggleCollect('${lion.id}')" class="sketch-btn px-2.5 py-1 text-xs font-black ${lion.isCollected ? 'bg-stone-200 text-stone-700' : 'bg-[#E05A47] text-white'}">
-                ${lion.isCollected ? '✓ 已收集' : '💮 蓋章'}
-              </button>
+              <button onclick="toggleCollect('${lion.id}')" class="sketch-btn px-2.5 py-1 text-xs font-black ${lion.isCollected ? 'bg-stone-200 text-stone-700' : 'bg-[#E05A47] text-white'}">${lion.isCollected ? '✓ 已收集' : '💮 蓋章'}</button>
             </div>
           </div>
         `;
       }).join('');
     }
 
-    // =========================================================
-    // 9. 收集與 GPS 控制邏輯
-    // =========================================================
     function toggleCollect(lionId) {
       const idx = collectedIds.indexOf(lionId);
-      if (idx === -1) {
-        collectedIds.push(lionId);
-        playSound('stamp');
-      } else {
-        collectedIds.splice(idx, 1);
-      }
+      if (idx === -1) { collectedIds.push(lionId); playSound('stamp'); }
+      else { collectedIds.splice(idx, 1); }
       localStorage.setItem(STORAGE_KEY, JSON.stringify(collectedIds));
       checkAchievements(true);
       updateUI();
@@ -1257,10 +1048,8 @@
       const count = collectedIds.length;
       const total = WIND_LIONS.length;
       const pct = Math.round((count / total) * 100);
-
       document.getElementById('collected-count').textContent = count;
       document.getElementById('progress-bar').style.width = `${pct}%`;
-
       document.getElementById('filter-all').textContent = `全部 (${total})`;
       document.getElementById('filter-uncollected').textContent = `未尋獲 (${total - count})`;
       document.getElementById('filter-collected').textContent = `已收集 (${count})`;
@@ -1270,87 +1059,43 @@
       currentFilter = filterType;
       ['all', 'uncollected', 'collected'].forEach(type => {
         const btn = document.getElementById(`filter-${type}`);
-        if (type === filterType) {
-          btn.className = 'sketch-btn flex-1 py-1 text-xs font-black bg-[#E05A47] text-white';
-        } else {
-          btn.className = 'sketch-btn flex-1 py-1 text-xs font-bold bg-[#FDF8EC]';
-        }
+        btn.className = (type === filterType) ? 'sketch-btn flex-1 py-1 text-xs font-black bg-[#E05A47] text-white' : 'sketch-btn flex-1 py-1 text-xs font-bold bg-[#FDF8EC]';
       });
       renderLionList();
     }
 
-    function setTownship(township) {
-      currentTownship = township;
-      updateUI();
-    }
-
-    function handleSearch(val) {
-      searchQuery = val.trim();
-      renderLionList();
-    }
-
+    function setTownship(township) { currentTownship = township; updateUI(); }
+    function handleSearch(val) { searchQuery = val.trim(); renderLionList(); }
     function resetProgress() {
       if (confirm('確定要清空所有收集印章、成就徽章與打卡照片嗎？')) {
-        collectedIds = [];
-        unlockedBadges.clear();
-        notifiedSet.clear();
-        localStorage.removeItem(STORAGE_KEY);
-        localStorage.removeItem(UNLOCKED_BADGES_KEY);
-        clearAllPhotosInDB();
-        checkAchievements(false);
-        updateUI();
+        collectedIds = []; unlockedBadges.clear(); notifiedSet.clear();
+        localStorage.removeItem(STORAGE_KEY); localStorage.removeItem(UNLOCKED_BADGES_KEY);
+        clearAllPhotosInDB(); checkAchievements(false); updateUI();
       }
     }
-
-    function updateUI() {
-      updateProgressUI();
-      renderLionList();
-      renderMapMarkers();
-    }
+    function updateUI() { updateProgressUI(); renderLionList(); renderMapMarkers(); }
 
     function toggleGPS() {
       const btnText = document.getElementById('gps-text');
       const dot = document.getElementById('gps-dot');
       const statusText = document.getElementById('location-status');
-
       if (isGpsActive) {
         if (watchId !== null) navigator.geolocation.clearWatch(watchId);
-        watchId = null;
-        isGpsActive = false;
+        watchId = null; isGpsActive = false;
         btnText.textContent = '開啟 GPS';
         dot.className = 'w-2.5 h-2.5 rounded-full bg-stone-500 border border-[#3D312A]';
         statusText.textContent = '📍 GPS 已暫停';
         return;
       }
-
-      if ('Notification' in window && Notification.permission === 'default') {
-        Notification.requestPermission();
-      }
-
-      if (!('geolocation' in navigator)) {
-        alert('你的瀏覽器不支援 GPS 定位，請使用卡片上的「✨ 模擬到站」按鈕體驗！');
-        return;
-      }
-
+      if ('Notification' in window && Notification.permission === 'default') Notification.requestPermission();
+      if (!('geolocation' in navigator)) { alert('不支援 GPS'); return; }
       isGpsActive = true;
       btnText.textContent = '雷達偵測中';
       dot.className = 'w-2.5 h-2.5 rounded-full bg-green-500 animate-ping border border-[#3D312A]';
       statusText.textContent = '📡 正在取得衛星定位...';
-
       watchId = navigator.geolocation.watchPosition(
-        pos => {
-          userPos = {
-            lat: pos.coords.latitude,
-            lng: pos.coords.longitude
-          };
-          statusText.textContent = `📍 即時定位 (${userPos.lat.toFixed(4)}, ${userPos.lng.toFixed(4)})`;
-          updateUserMapMarker();
-          checkProximityAndNotify();
-          updateUI();
-        },
-        err => {
-          statusText.textContent = '⚠️ 無法取得精準定位，可使用「模擬到站」測試';
-        },
+        pos => { userPos = { lat: pos.coords.latitude, lng: pos.coords.longitude }; updateUserMapMarker(); checkProximityAndNotify(); updateUI(); },
+        () => { statusText.textContent = '⚠️ 定位失敗，可用模擬到站'; },
         { enableHighAccuracy: true, maximumAge: 5000, timeout: 10000 }
       );
     }
@@ -1358,74 +1103,41 @@
     function simulateWalkTo(lionId) {
       const lion = WIND_LIONS.find(l => l.id === lionId);
       if (!lion) return;
-
-      userPos = {
-        lat: lion.lat - 0.00012,
-        lng: lion.lng - 0.00008
-      };
-
+      userPos = { lat: lion.lat - 0.00012, lng: lion.lng - 0.00008 };
       document.getElementById('location-status').textContent = `✨ 模擬位置：已抵達【${lion.name}】旁！`;
       updateUserMapMarker();
       map.flyTo([lion.lat, lion.lng], 16, { duration: 0.7 });
-
       notifiedSet.delete(lion.id);
       checkProximityAndNotify();
       updateUI();
     }
 
     function checkProximityAndNotify() {
-      let closestTarget = null;
-      let minDist = Infinity;
-
+      let closestTarget = null, minDist = Infinity;
       for (const lion of WIND_LIONS) {
         const dist = getDistanceMeters(userPos.lat, userPos.lng, lion.lat, lion.lng);
-        const isCollected = collectedIds.includes(lion.id);
-
-        if (dist <= alertRadius && !isCollected && !notifiedSet.has(lion.id)) {
-          if (dist < minDist) {
-            minDist = dist;
-            closestTarget = lion;
-          }
+        if (dist <= alertRadius && !collectedIds.includes(lion.id) && !notifiedSet.has(lion.id)) {
+          if (dist < minDist) { minDist = dist; closestTarget = lion; }
         }
       }
-
-      if (closestTarget) {
-        notifiedSet.add(closestTarget.id);
-        triggerProximityAlert(closestTarget, minDist);
-      }
+      if (closestTarget) { notifiedSet.add(closestTarget.id); triggerProximityAlert(closestTarget, minDist); }
     }
 
     function triggerProximityAlert(lion, dist) {
       currentAlertLionId = lion.id;
       playSound('radar');
-
       const alertBox = document.getElementById('proximity-alert');
       document.getElementById('alert-title').textContent = `${lion.name} 就在附近！`;
-      document.getElementById('alert-desc').textContent = `目前距離約 ${dist} 公尺（低於設定的 ${formatDistance(alertRadius)}），快去拍照蓋章吧！`;
+      document.getElementById('alert-desc').textContent = `距離約 ${dist} 公尺，快去拍照蓋章吧！`;
       alertBox.classList.remove('hidden');
-
-      if ('Notification' in window && Notification.permission === 'granted') {
-        new Notification(`🦁 發現風獅爺：${lion.name}！`, {
-          body: `距離僅 ${dist} 公尺（${lion.township}）！${lion.feature}`
-        });
-      }
     }
 
     function collectFromAlert() {
-      if (currentAlertLionId && !collectedIds.includes(currentAlertLionId)) {
-        toggleCollect(currentAlertLionId);
-      }
+      if (currentAlertLionId && !collectedIds.includes(currentAlertLionId)) toggleCollect(currentAlertLionId);
       closeAlert();
     }
+    function closeAlert() { document.getElementById('proximity-alert').classList.add('hidden'); currentAlertLionId = null; }
 
-    function closeAlert() {
-      document.getElementById('proximity-alert').classList.add('hidden');
-      currentAlertLionId = null;
-    }
-
-    // =========================================================
-    // 10. 啟動初始化
-    // =========================================================
     window.addEventListener('DOMContentLoaded', async () => {
       document.getElementById('header-lion-icon').innerHTML = generateLionSVG(WIND_LIONS[62], true, 56);
       await initPhotoDB();
